@@ -20,6 +20,9 @@ public enum BaseResponseStatus {
      */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, false, 900, "Internal server error"),
 
+    // 상품 : 4000번대
+    DISCOUNT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, false, 4001, "존재하지 않는 할인 유형입니다")
+
     ;
     private final HttpStatusCode httpStatusCode;
     private final boolean isSuccess;
