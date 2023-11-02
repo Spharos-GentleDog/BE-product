@@ -9,14 +9,4 @@ import lombok.*;
 @AllArgsConstructor
 public class Products {
 
-    private String productName;
-    private Integer productPrice;
-    private String productCode;
-    private String brandName;
-    private String brandLogoUrl;
-    private Integer discount;
-    private DiscountTypes discountTypes;
-    private String productImageUrl;
-
-
 }
