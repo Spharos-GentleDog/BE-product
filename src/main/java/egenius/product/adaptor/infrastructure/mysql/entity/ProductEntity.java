@@ -35,7 +35,7 @@ public class ProductEntity extends BaseTimeEntity {
     private String brandLogoUrl;
 
     @Column(name = "discount_rate", nullable = false)
-    private Integer discount;
+    private Integer discountRate;
 
     @Column(name = "discount_type", nullable = false)
     private Integer discountTypes; // enum 타입의 code 저장 (0: 퍼센트, 1: 금액)
