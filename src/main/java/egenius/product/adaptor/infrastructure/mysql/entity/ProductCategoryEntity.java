@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "product_category")
 public class ProductCategoryEntity extends BaseTimeEntity {
 
     @Id
@@ -21,11 +22,11 @@ public class ProductCategoryEntity extends BaseTimeEntity {
     private String categoryName;
 
     //자기 참조
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne // 자기 참조라서 fetch = FetchType.LAZY가 의미가 없음
     @JoinColumn(name = "parent_category", referencedColumnName = "id")
     private ProductCategoryEntity parentCategory; // 카테고리 대분류
 
-    @OneToMany(mappedBy = "parent_category")
+    @OneToMany(mappedBy = "parentCategory")
     @Column(name = "child_category")
     private List<ProductCategoryEntity> childCategory;// 하위 카테고리들 (중분류)
 

@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "product_image")
 public class ProductImageEntity {
 
     @Id
@@ -22,5 +23,9 @@ public class ProductImageEntity {
 
     @Column(name = "main_image", nullable = false)
     private Integer mainImage; //enum (0: 사용, 1: 사용안함)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="product_id", referencedColumnName = "id")
+    private ProductEntity productId; // 상품 인덱스
 
 }

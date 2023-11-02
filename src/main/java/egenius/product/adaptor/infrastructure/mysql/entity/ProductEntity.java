@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "product")
 public class ProductEntity extends BaseTimeEntity {
 
     @Id
@@ -42,6 +43,7 @@ public class ProductEntity extends BaseTimeEntity {
     // 연관관계있는 entity 연결
     // 중간 테이블 관리를 위한 연관 관계 설정
     // CascadeType 뭘로 할지 고민 중
+    // 아래 부분은 상품 조회시 다 필요한 부분이라서 EAGER로 설정
     @OneToMany(mappedBy = "productId" , cascade = CascadeType.ALL)
     private List<ProductCategoryListEntity> productCategoryListEntity;
 
