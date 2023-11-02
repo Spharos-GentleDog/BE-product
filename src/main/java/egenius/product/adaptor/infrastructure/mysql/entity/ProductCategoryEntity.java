@@ -22,7 +22,7 @@ public class ProductCategoryEntity extends BaseTimeEntity {
     private String categoryName;
 
     //자기 참조
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne // 자기 참조라서 fetch = FetchType.LAZY가 의미가 없음
     @JoinColumn(name = "parent_category", referencedColumnName = "id")
     private ProductCategoryEntity parentCategory; // 카테고리 대분류
 
