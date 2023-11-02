@@ -3,7 +3,6 @@ package egenius.product.adaptor.infrastructure.mysql.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -11,6 +10,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "color")
 public class ColorEntity {
 
     @Id
@@ -37,7 +37,7 @@ public class ColorEntity {
     @JoinColumn(name = "parent_color", referencedColumnName = "id")
     private ColorEntity parentColor; // 색상 분류
 
-    @OneToMany(mappedBy = "parent_color")
+    @OneToMany(mappedBy = "parentColor")
     @Column(name = "child_colors")
     private List<ColorEntity> childColors;// 하위 색상들
 

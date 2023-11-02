@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "favorite_product_total")
 public class FavoriteProductTotalEntity {
     // 총 찜 수 계산 후 결과 값 저장
 
