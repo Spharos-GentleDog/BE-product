@@ -13,15 +13,18 @@ import java.util.List;
 @Table(name = "color")
 public class ColorEntity {
 
+    // 판매자가 상품 등록시 해당하는 색상을 선택
+    // 각 색상 분류별로 해당하는 색은 DB에 안 담는게 나을 듯 함
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "color_code",nullable = false)
-    private Integer colorCode; // 색상 코드 (숫자 값)
+    private String colorCode; // 색상 코드 (헥스 코드 값
 
     @Column(name = "colorName",nullable = false, length = 20)
-    private String colorName; // 색상 명칭 (헥스 코드 값)
+    private String colorName; // 색상 명칭 (검정,빨강 등등)
 
     @Column(name = "color_red",nullable = false)
     private Integer colorRed;
