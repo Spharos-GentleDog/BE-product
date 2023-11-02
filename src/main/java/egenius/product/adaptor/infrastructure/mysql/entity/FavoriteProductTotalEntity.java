@@ -17,7 +17,7 @@ public class FavoriteProductTotalEntity {
     private Long id;
 
     @Column(name = "total_favorite", nullable = true)
-    private Float totalFavorite;
+    private Integer totalFavorite;
 
     @OneToOne // fetch = FetchType.LAZY를 걸어줘도 기본적으로 EAGER로 동작함
     @JoinColumn(name = "product_id", referencedColumnName = "id")
