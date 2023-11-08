@@ -1,5 +1,6 @@
 package egenius.product.adaptor.infrastructure.mysql.entity;
 
+import egenius.product.adaptor.infrastructure.mysql.entity.ProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

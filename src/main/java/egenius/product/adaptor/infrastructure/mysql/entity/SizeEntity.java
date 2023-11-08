@@ -18,5 +18,11 @@ public class SizeEntity {
     @Column(name = "size_name", nullable = false,length = 20)
     private String sizeName;
 
+    public static SizeEntity createSize(String sizeName) {
+        return SizeEntity.builder()
+                .sizeName(sizeName)
+                .build();
+    }
+
 
 }

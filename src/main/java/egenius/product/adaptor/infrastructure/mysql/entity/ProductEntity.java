@@ -1,6 +1,5 @@
 package egenius.product.adaptor.infrastructure.mysql.entity;
 
-import egenius.product.domain.enums.DiscountTypes;
 import egenius.product.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,10 +33,10 @@ public class ProductEntity extends BaseTimeEntity {
     @Column(name = "brand_logo_url", nullable = false)
     private String brandLogoUrl;
 
-    @Column(name = "discount_rate", nullable = false)
+    @Column(name = "discount_rate", nullable = true)
     private Integer discount;
 
-    @Column(name = "discount_type", nullable = false)
+    @Column(name = "discount_type", nullable = true)
     private Integer discountTypes; // enum 타입의 code 저장 (0: 퍼센트, 1: 금액)
 
     // 연관관계있는 entity 연결
@@ -48,7 +47,7 @@ public class ProductEntity extends BaseTimeEntity {
     private List<ProductCategoryListEntity> productCategoryListEntity;
 
     @OneToMany(mappedBy = "productId" , cascade = CascadeType.ALL)
-    private List<ProductImageEntity> productImageEntity;
+    private List<ProductThumbnailsEntity> productThumbnailsEntity;
 
     @OneToMany(mappedBy = "productId" , cascade = CascadeType.ALL)
     private List<ProductSizeListEntity> productSizeListEntity;
