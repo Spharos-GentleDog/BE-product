@@ -2,7 +2,6 @@ package egenius.product.adaptor.infrastructure.mysql.persistance;
 
 import egenius.product.adaptor.infrastructure.mysql.entity.SizeEntity;
 import egenius.product.adaptor.infrastructure.mysql.repository.SizesRepository;
-import egenius.product.application.sizesports.out.dto.CreateSizeDto;
 import egenius.product.application.sizesports.out.dto.ReadAllSizesDto;
 import egenius.product.application.sizesports.out.port.CreateSizePort;
 import egenius.product.application.sizesports.out.port.ReadAllSizesPort;
@@ -24,16 +23,14 @@ public class SizesAdaptor implements CreateSizePort, ReadAllSizesPort {
     private final SizesRepository sizesRepository;
 
     @Override
-    public CreateSizeDto createSize(Sizes sizes) {
+    public void createSize(Sizes sizes) {
 
         SizeEntity sizeEntity = sizesRepository.save(SizeEntity.createSize(
                 sizes.getSizeName()
         ));
 
         if(sizeEntity != null) {
-            return CreateSizeDto.builder()
-                    .sizeName(sizeEntity.getSizeName())
-                    .build();
+            return;
         }
         throw new BaseException(BaseResponseStatus.CREATE_SIZE_FAIL);
 

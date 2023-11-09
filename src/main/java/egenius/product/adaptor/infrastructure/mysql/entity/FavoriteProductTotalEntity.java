@@ -20,7 +20,7 @@ public class FavoriteProductTotalEntity {
     @Column(name = "total_favorite", nullable = true)
     private Integer totalFavorite;
 
-    @OneToOne // fetch = FetchType.LAZY를 걸어줘도 기본적으로 EAGER로 동작함
+    @OneToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private ProductEntity productId; // 상품 인덱스
 }

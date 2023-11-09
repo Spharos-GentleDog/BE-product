@@ -1,7 +1,5 @@
 package egenius.product.domain;
 
-import egenius.product.adaptor.infrastructure.mysql.entity.ColorEntity;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +16,34 @@ public class Colors {
     private Integer colorRed;
     private Integer colorGreen;
     private Integer colorBlue;
-    private List<String> childColors;// 하위 색상들
+    private List<ColorDetails> childColors;// 하위 색상들
+
+    //색상 등록 (기본 제공 색상 등록)
+    public static Colors createColors(String colorCode, String colorName,
+                                      int colorRed, int colorGreen, int colorBlue) {
+        return Colors.builder()
+                .colorCode(colorCode)
+                .colorName(colorName)
+                .colorRed(colorRed)
+                .colorGreen(colorGreen)
+                .colorBlue(colorBlue)
+                .build();
+    }
+
+    //색상 조회 (전체 색상 조회)
+    public static Colors readColors(String colorCode, String colorName,
+                                    int colorRed, int colorGreen, int colorBlue) {
+        return Colors.builder()
+                .colorCode(colorCode)
+                .colorName(colorName)
+                .colorRed(colorRed)
+                .colorGreen(colorGreen)
+                .colorBlue(colorBlue)
+                .build();
+    }
+
+    //색상 삭제
+
+    //색상 수정
 
 }
