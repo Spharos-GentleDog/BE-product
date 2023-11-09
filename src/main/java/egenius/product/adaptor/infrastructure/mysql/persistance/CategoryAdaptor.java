@@ -3,9 +3,12 @@ package egenius.product.adaptor.infrastructure.mysql.persistance;
 import egenius.product.adaptor.infrastructure.mysql.entity.ProductCategoryEntity;
 import egenius.product.adaptor.infrastructure.mysql.repository.CategoryRepository;
 import egenius.product.application.categoryports.in.query.CreateParentCategoryQuery;
+import egenius.product.application.categoryports.out.dto.ParentCategoryDto;
+import egenius.product.application.categoryports.out.dto.ReadParentCategoryDto;
 import egenius.product.application.categoryports.out.port.CreateChildCategoryPort;
 import egenius.product.application.categoryports.out.port.CreateParentCategoryPort;
 import egenius.product.application.categoryports.out.port.FindParentCategoryNamePort;
+import egenius.product.application.categoryports.out.port.ReadParentCategoryPort;
 import egenius.product.domain.Categorys;
 import egenius.product.global.common.exception.BaseException;
 import egenius.product.global.common.response.BaseResponseStatus;
@@ -13,12 +16,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class CategoryAdaptor implements CreateParentCategoryPort, CreateChildCategoryPort, FindParentCategoryNamePort {
+public class CategoryAdaptor implements CreateParentCategoryPort, CreateChildCategoryPort, FindParentCategoryNamePort,
+        ReadParentCategoryPort {
 
     private final CategoryRepository categoryRepository;
 
@@ -63,5 +69,23 @@ public class CategoryAdaptor implements CreateParentCategoryPort, CreateChildCat
         }
 
         return productCategoryEntityName.get().getCategoryName();
+    }
+
+    @Override
+    public ReadParentCategoryDto readParentCategory() {
+
+        List<ProductCategoryEntity> productCategoryEntityList
+                = categoryRepository.findByParentCategoryIsNull();
+
+
+        List<ParentCategoryDto> parentCategoryDtoList =
+                productCategoryEntityList.stream()
+                        .map(productCategoryEntity -> ParentCategoryDto.fromParentCategoryDto(
+                                productCategoryEntity.getId(),
+                                productCategoryEntity.getCategoryName()
+                        ))
+                        .toList();
+
+        return ReadParentCategoryDto.formReadParentCategoryDto(parentCategoryDtoList);
     }
 }
