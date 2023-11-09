@@ -22,14 +22,27 @@ public class ProductCategoryEntity extends BaseTimeEntity {
     private String categoryName;
 
     //자기 참조
-    @ManyToOne // 자기 참조라서 fetch = FetchType.LAZY가 의미가 없음
+    @ManyToOne
     @JoinColumn(name = "parent_category", referencedColumnName = "id")
     private ProductCategoryEntity parentCategory; // 카테고리 대분류
 
-    @OneToMany(mappedBy = "parentCategory")
+    @OneToMany(mappedBy = "parentCategory", fetch = FetchType.LAZY)
     @Column(name = "child_category")
     private List<ProductCategoryEntity> childCategory;// 하위 카테고리들 (중분류)
 
+    // 카테고리 등록 (대분류 등록)
+    public static ProductCategoryEntity createParentCategory(String categoryName){
+        return ProductCategoryEntity.builder()
+                .categoryName(categoryName)
+                .build();
+    }
 
 
+    public static ProductCategoryEntity createChildCategory(String categoryName, ProductCategoryEntity parentCategory) {
+        return ProductCategoryEntity.builder()
+                .categoryName(categoryName)
+                .parentCategory(parentCategory)
+                .build();
+
+    }
 }

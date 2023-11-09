@@ -35,14 +35,16 @@ public class ColorEntity {
     @Column(name = "color_blue",nullable = false)
     private Integer colorBlue;
 
-    //자기 참조
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_color", referencedColumnName = "id")
-    private ColorEntity parentColor; // 색상 분류
-
-    @OneToMany(mappedBy = "parentColor")
-    @Column(name = "child_colors")
-    private List<ColorEntity> childColors;// 하위 색상들
+    public static ColorEntity createColor(String colorCode, String colorName,
+                                          Integer colorRed, Integer colorGreen, Integer colorBlue){
+        return ColorEntity.builder()
+                .colorCode(colorCode)
+                .colorName(colorName)
+                .colorRed(colorRed)
+                .colorGreen(colorGreen)
+                .colorBlue(colorBlue)
+                .build();
+    }
 
 
 }

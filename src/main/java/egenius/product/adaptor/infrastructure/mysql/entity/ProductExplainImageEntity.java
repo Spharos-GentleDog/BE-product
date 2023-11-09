@@ -1,6 +1,5 @@
 package egenius.product.adaptor.infrastructure.mysql.entity;
 
-import egenius.product.adaptor.infrastructure.mysql.entity.ProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,18 +8,18 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "favorite_product_total")
-public class FavoriteProductTotalEntity {
-    // 총 찜 수 계산 후 결과 값 저장
+@Table(name = "product_explain_image")
+public class ProductExplainImageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // 상품 설명 이미지 인덱스
 
-    @Column(name = "total_favorite", nullable = true)
-    private Integer totalFavorite;
+    @Column(name = "explain_image_url", nullable = false)
+    private String explainImageUrl; // 이미지 URL
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private ProductEntity productId; // 상품 인덱스
+
 }
