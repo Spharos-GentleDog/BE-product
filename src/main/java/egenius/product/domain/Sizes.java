@@ -18,18 +18,26 @@ public class Sizes {
                 .build();
     }
 
-    //사이즈 삭제
+    // 기본 사이즈 조회 (사이즈 전체 조회)
+    public static Sizes readSizes(String sizeName) {
+        return Sizes.builder()
+                .sizeName(sizeName)
+                .build();
+    }
+
+    //todo : 사이즈 삭제
     public static Sizes deleteSizes(String sizeName) {
         return Sizes.builder()
                 .sizeName(sizeName)
                 .build();
     }
 
-    //사이즈 수정
+    //todo : 사이즈 수정
     public static Sizes updateSizes(String sizeName) {
         return Sizes.builder()
                 .sizeName(sizeName)
                 .build();
     }
+
 
 }

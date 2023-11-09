@@ -1,4 +1,4 @@
-package egenius.product.application.sizeports.out.dto;
+package egenius.product.application.sizesports.out.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package egenius.product.application.sizeports.in.query;
+package egenius.product.application.sizesports.in.query;
 
 import lombok.Builder;
 import lombok.Getter;
