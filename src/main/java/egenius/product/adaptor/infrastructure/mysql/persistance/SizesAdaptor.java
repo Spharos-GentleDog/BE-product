@@ -2,6 +2,7 @@ package egenius.product.adaptor.infrastructure.mysql.persistance;
 
 import egenius.product.adaptor.infrastructure.mysql.entity.SizeEntity;
 import egenius.product.adaptor.infrastructure.mysql.repository.SizesRepository;
+import egenius.product.application.sizesports.out.dto.AllSizeDto;
 import egenius.product.application.sizesports.out.dto.ReadAllSizesDto;
 import egenius.product.application.sizesports.out.port.CreateSizePort;
 import egenius.product.application.sizesports.out.port.ReadAllSizesPort;
@@ -41,11 +42,11 @@ public class SizesAdaptor implements CreateSizePort, ReadAllSizesPort {
     public ReadAllSizesDto readAllSizes() {
 
         List<SizeEntity> sizeEntityList = sizesRepository.findAll();
-        ReadAllSizesDto readAllSizesDto = ReadAllSizesDto.formReadSizes(
-                sizeEntityList.stream()
-                .map(SizeEntity::getSizeName)
-                .collect(Collectors.toList()));
 
-        return readAllSizesDto;
+        List<AllSizeDto> allSizeDtoList = sizeEntityList.stream()
+                .map(sizeEntity -> AllSizeDto.fromAllSizeDto(sizeEntity.getId(), sizeEntity.getSizeName()))
+                .collect(Collectors.toList());
+
+        return ReadAllSizesDto.formReadSizes(allSizeDtoList);
     }
 }

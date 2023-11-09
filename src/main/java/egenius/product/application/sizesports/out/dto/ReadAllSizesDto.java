@@ -11,11 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 public class ReadAllSizesDto {
 
-    private List<String> sizeNames;
+    private List<AllSizeDto> AllSizeDtoList;
 
-    public static ReadAllSizesDto formReadSizes(List<String> sizeNames){
+    public static ReadAllSizesDto formReadSizes(List<AllSizeDto> allSizeDtoList){
         return ReadAllSizesDto.builder()
-                .sizeNames(sizeNames)
+                .AllSizeDtoList(allSizeDtoList)
                 .build();
     }
 
