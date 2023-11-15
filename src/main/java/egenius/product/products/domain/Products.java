@@ -17,7 +17,7 @@ public class Products {
     private List<String> categoryName; // 카테고리명
     private List<String> sizeName; // 사이즈명
     private List<String> colorName; // 컬러명
-    private List<ProductDetails> producrDetail; // 세부 상품들
+    private List<ProductDetails> productDetail; // 세부 상품들
     private List<String> ThumbnailsImageUrl; // 썸네일Url
     private List<String> explainImageUrl; // 설명 이미지 Url
     private String vendorEmail; // 판매자 정보 (이메일)
@@ -25,30 +25,31 @@ public class Products {
     private Integer salesCount; // 재고 수량
     private Integer saveCount; // 안심 재고 수량
 
-//    // 상품 생성
-//    public static Products createProducts(String productName, Integer productPrice, String productCode,
-//                                          String brandName, String brandLogoUrl, Integer discount,
-//                                          DiscountTypes discountTypes, Integer totalFavorite,
-//                                          List<String> categoryName, List<String> sizeName,
-//                                          List<String> colorName, List<String> ThumbnailsImageUrl,
-//                                          List<String> explainImageUrl, String vendorEmail) {
-//        return Products.builder()
-//                .productName(productName)
-//                .productPrice(productPrice)
-//                .productCode(productCode)
-//                .brandName(brandName)
-//                .brandLogoUrl(brandLogoUrl)
-//                .discount(discount)
-//                .discountTypes(discountTypes)
-//                .totalFavorite(totalFavorite)
-//                .categoryName(categoryName)
-//                .sizeName(sizeName)
-//                .colorName(colorName)
-//                .ThumbnailsImageUrl(ThumbnailsImageUrl)
-//                .explainImageUrl(explainImageUrl)
-//                .vendorEmail(vendorEmail)
-//                .build();
-//    }
+    // 상품 생성
+    public static Products createProduct(String productCode, String productName, String brandName,
+                                         String brandLogoUrl, Integer totalFavorite, List<String> categoryName,
+                                         List<String> sizeName, List<String> colorName,
+                                         List<ProductDetails> productDetail, List<String> ThumbnailsImageUrl,
+                                         List<String> explainImageUrl, String vendorEmail, String salesStatus,
+                                         Integer salesCount, Integer saveCount){
+        return Products.builder()
+                .productCode(productCode)
+                .productName(productName)
+                .brandName(brandName)
+                .brandLogoUrl(brandLogoUrl)
+                .totalFavorite(totalFavorite)
+                .categoryName(categoryName)
+                .sizeName(sizeName)
+                .colorName(colorName)
+                .productDetail(productDetail)
+                .ThumbnailsImageUrl(ThumbnailsImageUrl)
+                .explainImageUrl(explainImageUrl)
+                .vendorEmail(vendorEmail)
+                .salesStatus(salesStatus)
+                .salesCount(salesCount)
+                .saveCount(saveCount)
+                .build();
+    }
 
 
 }
