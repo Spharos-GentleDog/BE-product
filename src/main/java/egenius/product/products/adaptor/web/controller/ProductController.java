@@ -1,5 +1,6 @@
 package egenius.product.products.adaptor.web.controller;
 
+import egenius.product.global.common.response.BaseResponse;
 import egenius.product.products.adaptor.web.request.RequestCreateProduct;
 import egenius.product.products.application.ports.in.port.CreateProductUseCase;
 import egenius.product.products.application.ports.in.query.CreateProductQuery;
@@ -19,7 +20,7 @@ public class ProductController {
     private final CreateProductUseCase createProductUseCase;
 
     @PostMapping("/product-create")
-    public void productCreate(@RequestBody RequestCreateProduct requestCreateProduct){
+    public BaseResponse<?> productCreate(@RequestBody RequestCreateProduct requestCreateProduct){
         log.info("상품 등록");
         createProductUseCase.createProduct(CreateProductQuery.toQuery(
                 requestCreateProduct.getProductName(),
@@ -32,7 +33,7 @@ public class ProductController {
                 requestCreateProduct.getMainImageUrl(),
                 requestCreateProduct.getThumbnailsImageUrl(),
                 requestCreateProduct.getExplainImageUrl()));
-
+        return new BaseResponse<>();
 
     }
 
