@@ -17,5 +17,17 @@ public class ProductDetails {
     private String colorName; // 컬러명
     private String sizeName; // 사이즈명
 
+    // 상품 세부 생성
+    public static ProductDetails createProductDetails(String productDetailCode, Integer productPrice, Integer discountRate,
+                                                      DiscountTypes discountTypes, String colorName, String sizeName) {
+        return ProductDetails.builder()
+                .productDetailCode(productDetailCode)
+                .productPrice(productPrice)
+                .discountRate(discountRate)
+                .discountTypes(discountTypes)
+                .colorName(colorName)
+                .sizeName(sizeName)
+                .build();
+    }
 
 }

@@ -39,8 +39,6 @@ public class QProductDetailEntity extends EntityPathBase<ProductDetailEntity> {
 
     public final QProductEntity productId;
 
-    public final NumberPath<Integer> productPrice = createNumber("productPrice", Integer.class);
-
     public final StringPath size = createString("size");
 
     //inherited

@@ -15,6 +15,9 @@ public class ProductThumbnailsEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "thumbnails_image_name", nullable = false)
+    private String ThumbnailsImageName;
+
     @Column(name = "thumbnails_image_url", nullable = false)
     private String ThumbnailsImageUrl;
 
@@ -24,5 +27,15 @@ public class ProductThumbnailsEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id", referencedColumnName = "id")
     private ProductEntity productId; // 상품 인덱스
+
+    public static ProductThumbnailsEntity createProductThumbnails(String ThumbnailsImageName, String ThumbnailsImageUrl,
+                                                                  Integer usedMainImage, ProductEntity productId) {
+        return ProductThumbnailsEntity.builder()
+                .ThumbnailsImageName(ThumbnailsImageName)
+                .ThumbnailsImageUrl(ThumbnailsImageUrl)
+                .usedMainImage(usedMainImage)
+                .productId(productId)
+                .build();
+    }
 
 }

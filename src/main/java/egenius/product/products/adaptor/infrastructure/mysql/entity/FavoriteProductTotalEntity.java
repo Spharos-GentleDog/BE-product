@@ -22,4 +22,11 @@ public class FavoriteProductTotalEntity {
     @OneToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private ProductEntity productId; // 상품 인덱스
+
+    public static FavoriteProductTotalEntity createFavoriteProductTotal(Integer totalFavorite, ProductEntity productId) {
+        return FavoriteProductTotalEntity.builder()
+                .totalFavorite(totalFavorite)
+                .productId(productId)
+                .build();
+    }
 }

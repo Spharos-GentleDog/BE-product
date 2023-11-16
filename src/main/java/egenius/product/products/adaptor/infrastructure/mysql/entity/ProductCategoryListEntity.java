@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "favorite_product_total")
+@Table(name = "product_category_list")
 public class ProductCategoryListEntity {
 
     @Id
@@ -27,6 +27,13 @@ public class ProductCategoryListEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="category_id", referencedColumnName = "id")
     private ProductCategoryEntity categoryId; // 카테고리 인덱스
+
+    public static ProductCategoryListEntity createProductCategoryList(ProductCategoryEntity categoryId, ProductEntity productId) {
+        return ProductCategoryListEntity.builder()
+                .productId(productId)
+                .categoryId(categoryId)
+                .build();
+    }
 
 
 

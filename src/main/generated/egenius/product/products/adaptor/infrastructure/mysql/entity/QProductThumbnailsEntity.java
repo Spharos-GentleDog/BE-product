@@ -26,6 +26,8 @@ public class QProductThumbnailsEntity extends EntityPathBase<ProductThumbnailsEn
 
     public final QProductEntity productId;
 
+    public final StringPath ThumbnailsImageName = createString("ThumbnailsImageName");
+
     public final StringPath ThumbnailsImageUrl = createString("ThumbnailsImageUrl");
 
     public final NumberPath<Integer> usedMainImage = createNumber("usedMainImage", Integer.class);

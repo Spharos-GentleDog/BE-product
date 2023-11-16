@@ -19,24 +19,31 @@ public class ProductDetailEntity extends BaseTimeEntity {
     @Column(name = "product_detail_code", nullable = false)
     private String productDetailCode;
 
-    @Column(name = "product_price", nullable = false)
-    private Integer productPrice;
-
     @Column(name = "color", nullable = false)
     private String color;
 
     @Column(name = "size", nullable = false)
     private String size;
 
-    @Column(name = "discount_rate", nullable = false)
+    @Column(name = "discount_rate")
     private Integer discountRate;
 
-    @Column(name = "discount_type", nullable = true)
+    @Column(name = "discount_type")
     private Integer discountTypes; // enum 타입의 code 저장 (0: 퍼센트, 1: 금액)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", referencedColumnName="id")
     private ProductEntity productId; // 상품 인덱스
+
+    public static ProductDetailEntity createProductDetail(String productDetailCode, String color,
+                                                          String size, ProductEntity productId){
+        return ProductDetailEntity.builder()
+                .productDetailCode(productDetailCode)
+                .color(color)
+                .size(size)
+                .productId(productId)
+                .build();
+    }
 
 
 }

@@ -15,11 +15,22 @@ public class ProductExplainImageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 상품 설명 이미지 인덱스
 
+    @Column(name = "explain_image_name", nullable = false)
+    private String explainImageName; // 이미지 이름
+
     @Column(name = "explain_image_url", nullable = false)
     private String explainImageUrl; // 이미지 URL
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private ProductEntity productId; // 상품 인덱스
+
+    public static ProductExplainImageEntity createProductExplainImage(String explainImageName, String explainImageUrl, ProductEntity productId) {
+        return ProductExplainImageEntity.builder()
+                .explainImageName(explainImageName)
+                .explainImageUrl(explainImageUrl)
+                .productId(productId)
+                .build();
+    }
 
 }

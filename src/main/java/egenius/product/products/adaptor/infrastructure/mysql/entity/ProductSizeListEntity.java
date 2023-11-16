@@ -23,4 +23,11 @@ public class ProductSizeListEntity {
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name="size_id", referencedColumnName = "id")
         private SizeEntity sizeId; // 사이즈 인덱스
+
+        public static ProductSizeListEntity createProductSizeList(SizeEntity sizeId, ProductEntity productId){
+                return ProductSizeListEntity.builder()
+                        .productId(productId)
+                        .sizeId(sizeId)
+                        .build();
+        }
 }

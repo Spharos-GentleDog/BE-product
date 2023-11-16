@@ -22,6 +22,8 @@ public class QProductExplainImageEntity extends EntityPathBase<ProductExplainIma
 
     public static final QProductExplainImageEntity productExplainImageEntity = new QProductExplainImageEntity("productExplainImageEntity");
 
+    public final StringPath explainImageName = createString("explainImageName");
+
     public final StringPath explainImageUrl = createString("explainImageUrl");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);

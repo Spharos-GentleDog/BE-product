@@ -55,5 +55,16 @@ public class ProductEntity extends BaseTimeEntity {
     @OneToMany(mappedBy = "productId" , cascade = CascadeType.ALL)
     private List<ProductExplainImageEntity> productExplainImageEntity; // 상품 설명 이미지 정보
 
+    //상품 생성
+    public static ProductEntity createProduct(String productName, String productCode, Integer productPrice,
+                                              String brandName, String brandLogoUrl) {
+        return ProductEntity.builder()
+                .productName(productName)
+                .productCode(productCode)
+                .productPrice(productPrice)
+                .brandName(brandName)
+                .brandLogoUrl(brandLogoUrl)
+                .build();
+    }
 
 }

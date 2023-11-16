@@ -27,5 +27,12 @@ public class ProductColorListEntity {
     @JoinColumn(name="color_id", referencedColumnName = "id")
     private ColorEntity colorId; // 색상 인덱스
 
+    public static ProductColorListEntity createProductColorList(ColorEntity colorId, ProductEntity productId){
+        return ProductColorListEntity.builder()
+                .productId(productId)
+                .colorId(colorId)
+                .build();
+    }
+
 
 }
