@@ -18,6 +18,9 @@ public class ProductEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "vendor_email", nullable = false)
+    private String vendorEmail;
+
     @Column(name = "product_name", nullable = false)
     private String productName;
 
@@ -56,9 +59,10 @@ public class ProductEntity extends BaseTimeEntity {
     private List<ProductExplainImageEntity> productExplainImageEntity; // 상품 설명 이미지 정보
 
     //상품 생성
-    public static ProductEntity createProduct(String productName, String productCode, Integer productPrice,
+    public static ProductEntity createProduct(String vendorEmail, String productName, String productCode, Integer productPrice,
                                               String brandName, String brandLogoUrl) {
         return ProductEntity.builder()
+                .vendorEmail(vendorEmail)
                 .productName(productName)
                 .productCode(productCode)
                 .productPrice(productPrice)

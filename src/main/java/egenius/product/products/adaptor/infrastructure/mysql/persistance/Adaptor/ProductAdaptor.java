@@ -8,6 +8,7 @@ import egenius.product.global.common.exception.BaseException;
 import egenius.product.global.common.response.BaseResponseStatus;
 import egenius.product.products.adaptor.infrastructure.mysql.entity.*;
 import egenius.product.products.adaptor.infrastructure.mysql.repository.*;
+import egenius.product.products.application.ports.out.dto.CreateProductDto;
 import egenius.product.products.application.ports.out.port.CreateProductPort;
 import egenius.product.products.domain.Products;
 import egenius.product.sizes.adaptor.infrastructure.mysql.entity.SizeEntity;
@@ -17,7 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -39,11 +43,12 @@ public class ProductAdaptor implements CreateProductPort {
 
     @Override
     @Transactional
-    public void createProduct(Products products) {
+    public CreateProductDto createProduct(Products products) {
 
         log.info("상품 row 생성");
         // 상품 row 생성
         ProductEntity productEntity = productRepository.save(ProductEntity.createProduct(
+                products.getVendorEmail(),
                 products.getProductName(),
                 products.getProductCode(),
                 products.getProductPrice(),
@@ -158,6 +163,7 @@ public class ProductAdaptor implements CreateProductPort {
 
         log.info("상품세부 row 생성");
         //상품세부 row 생성
+        List<Long> productDetailIds = new ArrayList<>();
         for(int i = 0 ;  i < products.getColorName().size(); i++){
 
             for (int j = 0 ; j < products.getSizeName().size(); j++){
@@ -172,18 +178,20 @@ public class ProductAdaptor implements CreateProductPort {
                                 products.getSizeName().get(j).substring(0,2) :
                                 products.getSizeName().get(j));
 
-                productDetailRepository.save(ProductDetailEntity.createProductDetail(
+                ProductDetailEntity productDetailEntity = productDetailRepository.save(ProductDetailEntity.createProductDetail(
                         productDetailsCode,
                         products.getColorName().get(i),
                         products.getSizeName().get(j),
                         productEntity
                 ));
 
+                productDetailIds.add(productDetailEntity.getId());
 
             }
-
         }
 
+        CreateProductDto createProductDto = CreateProductDto.fromProductDetailId(productDetailIds);
 
+        return createProductDto;
     }
 }

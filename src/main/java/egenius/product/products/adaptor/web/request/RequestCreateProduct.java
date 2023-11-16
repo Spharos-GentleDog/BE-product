@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 public class RequestCreateProduct {
 
+    private String vendorEmail; // 판매자 ID
     private String productName; // 상품명
     private Integer productPrice; // 상품 가격 (상품별 가격 다 따로 받는 경우 금액도 리스트로 받아야 함)
     private String brandName; // 브랜드명

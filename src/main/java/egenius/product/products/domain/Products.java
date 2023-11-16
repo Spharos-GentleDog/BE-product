@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Products {
 
+    private String vendorEmail; // 판매자 ID
     private String productName; // 상품명
     private String productCode; // 상품 코드
     private Integer productPrice; // 상품 가격
@@ -29,12 +30,13 @@ public class Products {
 //    private Integer saveCount; // 안심 재고 수량 다른 서버 (kafka 적용 필요)
 
     // 상품 생성- kafka 미 적용
-    public static Products createProduct(String productName, String productCode, Integer productPrice,
+    public static Products createProduct(String vendorEmail, String productName, String productCode, Integer productPrice,
                                          String brandName, String brandLogoUrl, List<String> categoryName,
                                          List<String> sizeName, List<String> colorName,
                                          ImageInfo MainImageUrl, List<ImageInfo> ThumbnailsImageUrl,
                                          List<ImageInfo> explainImageUrl, Integer totalFavorite) {
         return Products.builder()
+                .vendorEmail(vendorEmail)
                 .productName(productName)
                 .productCode(productCode)
                 .productPrice(productPrice)

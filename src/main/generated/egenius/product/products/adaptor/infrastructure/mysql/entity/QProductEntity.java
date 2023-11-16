@@ -52,6 +52,8 @@ public class QProductEntity extends EntityPathBase<ProductEntity> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
+    public final StringPath vendorEmail = createString("vendorEmail");
+
     public QProductEntity(String variable) {
         super(ProductEntity.class, forVariable(variable));
     }
