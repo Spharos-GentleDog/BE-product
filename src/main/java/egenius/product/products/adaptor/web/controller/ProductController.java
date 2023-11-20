@@ -19,7 +19,8 @@ public class ProductController {
     @PostMapping("/product-create")
     public BaseResponse<?> productCreate(@RequestBody RequestCreateProduct requestCreateProduct){
         log.info("상품 등록");
-        return new BaseResponse<>(createProductUseCase.createProduct(CreateProductQuery.toQuery(
+
+        createProductUseCase.createProduct(CreateProductQuery.toQuery(
                 requestCreateProduct.getVendorEmail(),
                 requestCreateProduct.getProductName(),
                 requestCreateProduct.getProductPrice(),
@@ -30,7 +31,10 @@ public class ProductController {
                 requestCreateProduct.getColorName(),
                 requestCreateProduct.getMainImageUrl(),
                 requestCreateProduct.getThumbnailsImageUrl(),
-                requestCreateProduct.getExplainImageUrl())));
+                requestCreateProduct.getExplainImageUrl())
+        );
+
+        return new BaseResponse<>();
 
     }
 

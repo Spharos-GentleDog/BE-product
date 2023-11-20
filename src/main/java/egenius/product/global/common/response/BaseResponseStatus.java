@@ -25,7 +25,10 @@ public enum BaseResponseStatus {
     SIZE_IS_NOT_FOUND(HttpStatus.NOT_FOUND, false, 4002, "존재하지 않는 사이즈입니다"),
     CREATE_SIZE_FAIL(HttpStatus.BAD_REQUEST, false, 4003, "사이즈 생성에 실패하였습니다"),
     COLOR_CODE_ERROR(HttpStatus.BAD_REQUEST, false, 4004, "헥스코드를 올바르게 입력해주세요"),
-    NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, false, 4005, "존재하지 않는 카테고리입니다")
+    NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, false, 4005, "존재하지 않는 카테고리입니다"),
+    SALES_STATUS_IS_NOT_FOUND(HttpStatus.NOT_FOUND, false, 4006, "존재하지 않는 판매상태입니다"),
+    DISPLAY_STATUS_IS_NOT_FOUND(HttpStatus.NOT_FOUND, false, 4007, "존재하지 않는 진열상태입니다"),
+    NO_EXIST_PRODUCT(HttpStatus.NOT_FOUND, false, 4008, "존재하지 않는 상품입니다"),
     ;
 
 

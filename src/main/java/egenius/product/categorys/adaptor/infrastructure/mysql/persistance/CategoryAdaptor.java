@@ -3,14 +3,14 @@ package egenius.product.categorys.adaptor.infrastructure.mysql.persistance;
 import egenius.product.categorys.adaptor.infrastructure.mysql.entity.ProductCategoryEntity;
 import egenius.product.categorys.adaptor.infrastructure.mysql.repository.CategoryRepository;
 import egenius.product.categorys.application.ports.out.dto.ParentCategoryDto;
+import egenius.product.categorys.application.ports.out.dto.ReadChildCategoryCountDto;
+import egenius.product.categorys.application.ports.out.dto.ReadChildCategoryDto;
 import egenius.product.categorys.application.ports.out.dto.ReadParentCategoryDto;
-import egenius.product.categorys.application.ports.out.port.CreateChildCategoryPort;
-import egenius.product.categorys.application.ports.out.port.CreateParentCategoryPort;
-import egenius.product.categorys.application.ports.out.port.FindParentCategoryNamePort;
-import egenius.product.categorys.application.ports.out.port.ReadParentCategoryPort;
+import egenius.product.categorys.application.ports.out.port.*;
 import egenius.product.categorys.domain.Categorys;
 import egenius.product.global.common.exception.BaseException;
 import egenius.product.global.common.response.BaseResponseStatus;
+import egenius.product.products.adaptor.infrastructure.mysql.repository.ProductCategoryListRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,9 +22,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class CategoryAdaptor implements CreateParentCategoryPort, CreateChildCategoryPort, FindParentCategoryNamePort,
-        ReadParentCategoryPort {
+        ReadParentCategoryPort, ReadChildCategoryPort, ReadChildCategoryCountPort {
 
     private final CategoryRepository categoryRepository;
+    private final ProductCategoryListRepository productCategoryListRepository;
 
 
     @Override
@@ -85,5 +86,68 @@ public class CategoryAdaptor implements CreateParentCategoryPort, CreateChildCat
                         .toList();
 
         return ReadParentCategoryDto.formReadParentCategoryDto(parentCategoryDtoList);
+    }
+
+    @Override
+    public List<ReadChildCategoryDto> readChildCategory(Categorys categorys) {
+
+        Optional<ProductCategoryEntity> parentCategoryEntity =
+                categoryRepository.findByCategoryName(categorys.getParentCategory());
+
+        if(parentCategoryEntity.isEmpty()){
+            throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
+        }
+
+        List<ProductCategoryEntity> productCategoryEntityList =
+                categoryRepository.findByParentCategory(parentCategoryEntity.get());
+
+        if(productCategoryEntityList.isEmpty()){
+            throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
+        }
+
+        List<ReadChildCategoryDto> readChildCategoryDtoList =
+                productCategoryEntityList.stream()
+                        .map(productCategoryEntity -> ReadChildCategoryDto.fromChildCategory(
+                                productCategoryEntity.getId(),
+                                productCategoryEntity.getCategoryName()
+                        ))
+                        .toList();
+
+        return readChildCategoryDtoList;
+    }
+
+    @Override
+    public List<ReadChildCategoryCountDto> readChildCategoryCount(Categorys categorys) {
+
+        Optional<ProductCategoryEntity> parentCategoryEntity =
+                categoryRepository.findByCategoryName(categorys.getParentCategory());
+
+        if(parentCategoryEntity.isEmpty()){
+            throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
+        }
+
+        List<ProductCategoryEntity> productCategoryEntityList =
+                categoryRepository.findByParentCategory(parentCategoryEntity.get());
+
+        if(productCategoryEntityList.isEmpty()){
+            throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
+        }
+
+        List<ReadChildCategoryCountDto> readChildCategoryCountDtoList =
+                productCategoryEntityList.stream()
+                        .map(productCategoryEntity -> {
+
+                            Integer count = productCategoryListRepository.findByCategoryId(productCategoryEntity);
+                            log.info("count : {}",count);
+                            return ReadChildCategoryCountDto.fromChildCategory(
+                                    productCategoryEntity.getId(),
+                                    productCategoryEntity.getCategoryName(),
+                                    count
+                            );
+
+                        })
+                        .toList();
+
+        return readChildCategoryCountDtoList;
     }
 }

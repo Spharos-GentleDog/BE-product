@@ -5,5 +5,5 @@ import egenius.product.products.domain.Products;
 
 public interface CreateProductPort {
 
-    CreateProductDto createProduct(Products products);
+    void createProduct(Products products);
 }

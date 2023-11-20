@@ -1,29 +1,33 @@
 package egenius.product.categorys.application.service;
 
-import egenius.product.categorys.application.ports.in.port.CreateChildCategoryUseCase;
-import egenius.product.categorys.application.ports.in.port.CreateParentCategoryUseCase;
-import egenius.product.categorys.application.ports.in.port.ReadParentCategoryUseCase;
+import egenius.product.categorys.application.ports.in.port.*;
 import egenius.product.categorys.application.ports.in.query.CreateChildCategoryQuery;
 import egenius.product.categorys.application.ports.in.query.CreateParentCategoryQuery;
+import egenius.product.categorys.application.ports.in.query.ReadChildCategoryCountQuery;
+import egenius.product.categorys.application.ports.in.query.ReadChildCategoryQuery;
+import egenius.product.categorys.application.ports.out.dto.ReadChildCategoryCountDto;
+import egenius.product.categorys.application.ports.out.dto.ReadChildCategoryDto;
 import egenius.product.categorys.application.ports.out.dto.ReadParentCategoryDto;
-import egenius.product.categorys.application.ports.out.port.CreateChildCategoryPort;
-import egenius.product.categorys.application.ports.out.port.CreateParentCategoryPort;
-import egenius.product.categorys.application.ports.out.port.FindParentCategoryNamePort;
-import egenius.product.categorys.application.ports.out.port.ReadParentCategoryPort;
+import egenius.product.categorys.application.ports.out.port.*;
 import egenius.product.categorys.domain.Categorys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CategoryService implements CreateParentCategoryUseCase, CreateChildCategoryUseCase, ReadParentCategoryUseCase {
+public class CategoryService implements CreateParentCategoryUseCase, CreateChildCategoryUseCase,
+        ReadParentCategoryUseCase, ReadChildCategoryUseCase, ReadChildCategoryCountUseCase {
 
     private final CreateParentCategoryPort createParentCategoryPort;
     private final FindParentCategoryNamePort findParentCategoryNamePort;
     private final CreateChildCategoryPort createChildCategoryPort;
     private final ReadParentCategoryPort readParentCategoryPort;
+    private final ReadChildCategoryPort readChildCategoryPort;
+    private final ReadChildCategoryCountPort readChildCategoryCountPort;
 
     @Override
     public void createParentCategory(CreateParentCategoryQuery createParentCategoryQuery) {
@@ -55,5 +59,30 @@ public class CategoryService implements CreateParentCategoryUseCase, CreateChild
     public ReadParentCategoryDto readParentCategory() {
 
         return readParentCategoryPort.readParentCategory();
+    }
+
+    @Override
+    public List<ReadChildCategoryDto> readChildCategory(ReadChildCategoryQuery readChildCategoryQuery) {
+
+        String parentCategoryName = findParentCategoryNamePort.findParentCategoryName(
+                readChildCategoryQuery.getParentCategoryId());
+
+
+        return readChildCategoryPort.readChildCategory(
+                Categorys.readChildCategory(parentCategoryName)
+        );
+    }
+
+    @Override
+    public List<ReadChildCategoryCountDto> readChildCategoryCount(
+            ReadChildCategoryCountQuery readChildCategoryCountQuery) {
+
+        String parentCategoryName = findParentCategoryNamePort.findParentCategoryName(
+                readChildCategoryCountQuery.getParentCategoryId());
+
+        return readChildCategoryCountPort.readChildCategoryCount(
+                Categorys.readChildCategoryCount(parentCategoryName)
+        );
+
     }
 }

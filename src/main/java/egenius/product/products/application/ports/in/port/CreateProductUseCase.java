@@ -5,5 +5,5 @@ import egenius.product.products.application.ports.out.dto.CreateProductDto;
 
 public interface CreateProductUseCase {
 
-    CreateProductDto createProduct(CreateProductQuery createProductQuery);
+    void createProduct(CreateProductQuery createProductQuery);
 }
