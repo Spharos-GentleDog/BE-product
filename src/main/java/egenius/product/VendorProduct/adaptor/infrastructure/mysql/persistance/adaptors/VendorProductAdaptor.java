@@ -98,6 +98,12 @@ public class VendorProductAdaptor implements UpdateVendorProductPort, GetVendorP
                             SalesStatus salesStatus = salesStatusConverter.convertToEntityAttribute(
                                     vendorProductEntity.getSalesStatus());
 
+                            if(salesStatus.getCodeValue() == 4){
+                                // 삭제한 상품 일 경우 건너뛰기
+                                return null;
+                            }
+
+
                             String displayStatusName = displayStatus.getNameValue();
                             String salesStatusName = salesStatus.getNameValue();
 
