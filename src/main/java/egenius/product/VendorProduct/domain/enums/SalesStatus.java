@@ -11,7 +11,8 @@ public enum SalesStatus {
 
     SALES(1, "판매중"),
     STOP_SALES(2, "판매중지"),
-    SOLD_OUT(3, "품절");
+    SOLD_OUT(3, "품절"),
+    DELETE(4, "삭제");
 
     private Integer codeValue;
     private String nameValue;

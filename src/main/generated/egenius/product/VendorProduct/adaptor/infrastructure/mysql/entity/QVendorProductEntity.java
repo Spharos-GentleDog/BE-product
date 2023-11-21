@@ -24,7 +24,7 @@ public class QVendorProductEntity extends EntityPathBase<VendorProductEntity> {
 
     public final NumberPath<Integer> displayStatus = createNumber("displayStatus", Integer.class);
 
-    public final NumberPath<Long> Id = createNumber("Id", Long.class);
+    public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final egenius.product.products.adaptor.infrastructure.mysql.entity.QProductDetailEntity productDetailId;
 

@@ -102,7 +102,7 @@ public class CategoryAdaptor implements CreateParentCategoryPort, CreateChildCat
                 categoryRepository.findByParentCategory(parentCategoryEntity.get());
 
         if(productCategoryEntityList.isEmpty()){
-            throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
+            throw new BaseException(BaseResponseStatus.NOT_FOUND_CHILD_CATEGORY);
         }
 
         List<ReadChildCategoryDto> readChildCategoryDtoList =
@@ -130,7 +130,7 @@ public class CategoryAdaptor implements CreateParentCategoryPort, CreateChildCat
                 categoryRepository.findByParentCategory(parentCategoryEntity.get());
 
         if(productCategoryEntityList.isEmpty()){
-            throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
+            throw new BaseException(BaseResponseStatus.NOT_FOUND_CHILD_CATEGORY);
         }
 
         List<ReadChildCategoryCountDto> readChildCategoryCountDtoList =

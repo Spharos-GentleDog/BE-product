@@ -46,7 +46,7 @@ public class VendorProductController {
     // 상품 삭제
     @DeleteMapping("/vendor-products/{productDetailId}")
     public BaseResponse<?> deleteVendorProduct(@RequestHeader("email") String vendorEmail,
-                                               @PathVariable Long productDetailId){
+                                               @PathVariable(name = "productDetailId") Long productDetailId){
         log.info("상품 삭제: {} {}", vendorEmail, productDetailId);
         deleteVendorProductUseCase.deleteVendorProduct(
                 DeleteVendorProductQuery.toQuery(vendorEmail, productDetailId));

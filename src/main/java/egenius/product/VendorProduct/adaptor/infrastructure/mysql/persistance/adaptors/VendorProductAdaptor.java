@@ -43,20 +43,19 @@ public class VendorProductAdaptor implements UpdateVendorProductPort, GetVendorP
     private final FavoriteProductTotalRepository favoriteProductTotalRepository;
 
 
-    //todo : 상품 정보 변경 이거 id 값 프론트에서 받으면 된느데 왜 이렇게 짰지........ 나중에 바꾸기
     @Override
     public void updateVendorProduct(VendorProduct vendorProduct) {
-        log.info("판매자 상품 정보 변경");
+        log.info("판매자 상품 재고 정보 변경:{}", vendorProduct.getProductDetailId());
 
         Optional<ProductDetailEntity> productDetailEntity =
                 productDetailRepository.findById(vendorProduct.getProductDetailId());
 
-        if(productDetailEntity.isPresent()){
+        if(!productDetailEntity.isPresent()){
             //상품 세부가 없다고 에러처리
             throw new BaseException(BaseResponseStatus.NO_EXIST_PRODUCT);
 
         }
-
+        log.info("상품 세부 코드: {}", productDetailEntity.get().getId());
         VendorProductEntity vendorProductEntity =
                 vendorProductRepository.findByVendorEmailAndProductDetailId(
                         vendorProduct.getVendorEmail(),
@@ -168,7 +167,9 @@ public class VendorProductAdaptor implements UpdateVendorProductPort, GetVendorP
             throw new BaseException(BaseResponseStatus.NO_EXIST_PRODUCT);
         }
 
-        vendorProductRepository.delete(vendorProductEntity);
+        vendorProductEntity.deleteVendorProduct();
+
+        vendorProductRepository.save(vendorProductEntity);
     }
 
     // 장바구니 재고 조회

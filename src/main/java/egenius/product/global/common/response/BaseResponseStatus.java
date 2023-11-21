@@ -29,7 +29,7 @@ public enum BaseResponseStatus {
     SALES_STATUS_IS_NOT_FOUND(HttpStatus.NOT_FOUND, false, 4006, "존재하지 않는 판매상태입니다"),
     DISPLAY_STATUS_IS_NOT_FOUND(HttpStatus.NOT_FOUND, false, 4007, "존재하지 않는 진열상태입니다"),
     NO_EXIST_PRODUCT(HttpStatus.NOT_FOUND, false, 4008, "존재하지 않는 상품입니다"),
-    ;
+    NOT_FOUND_CHILD_CATEGORY(HttpStatus.NOT_FOUND, false, 4009, "하위 카테고리가 존재하지 않습니다"),;
 
 
     private final HttpStatusCode httpStatusCode;

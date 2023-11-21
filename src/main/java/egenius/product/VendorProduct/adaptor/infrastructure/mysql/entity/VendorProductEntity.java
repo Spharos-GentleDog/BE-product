@@ -14,7 +14,7 @@ public class VendorProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column(name = "vendor_email", nullable = false)
     private String vendorEmail;
@@ -58,6 +58,14 @@ public class VendorProductEntity {
         this.salesCount = salesCount;
         this.saveCount = saveCount;
 
+    }
+
+    public void deleteVendorProduct() {
+
+        this.displayStatus = 1;
+        this.salesStatus = 4;
+        this.salesCount = 0;
+        this.saveCount = 0;
     }
 
     //상품 삭제
