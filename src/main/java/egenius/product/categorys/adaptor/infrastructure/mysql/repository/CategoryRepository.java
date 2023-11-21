@@ -12,6 +12,8 @@ public interface CategoryRepository extends JpaRepository<ProductCategoryEntity,
     Optional<ProductCategoryEntity> findByCategoryName(String parentCategoryName);
 
     @Query(value = "SELECT * FROM product_category where parent_category is null", nativeQuery = true)
-    List<ProductCategoryEntity> findByParentCategoryIsNull();
+    List<ProductCategoryEntity> findByParentCategoryIsNull(); // 부모 카테고리 조회
 
+    // 자식 카테고리 조회
+    List<ProductCategoryEntity> findByParentCategory(ProductCategoryEntity productCategoryEntity);
 }

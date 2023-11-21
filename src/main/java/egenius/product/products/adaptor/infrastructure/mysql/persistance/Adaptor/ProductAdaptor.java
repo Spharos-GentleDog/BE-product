@@ -1,5 +1,7 @@
 package egenius.product.products.adaptor.infrastructure.mysql.persistance.Adaptor;
 
+import egenius.product.VendorProduct.adaptor.infrastructure.mysql.entity.VendorProductEntity;
+import egenius.product.VendorProduct.adaptor.infrastructure.mysql.repository.VendorProductRepository;
 import egenius.product.categorys.adaptor.infrastructure.mysql.entity.ProductCategoryEntity;
 import egenius.product.categorys.adaptor.infrastructure.mysql.repository.CategoryRepository;
 import egenius.product.colors.adaptor.infrastructure.mysql.entity.ColorEntity;
@@ -39,11 +41,12 @@ public class ProductAdaptor implements CreateProductPort {
     private final ColorRepository colorRepository;
     private final ProductColorListRepository productColorListRepository;
     private final ProductDetailRepository productDetailRepository;
+    private final VendorProductRepository vendorProductRepository;
 
 
     @Override
     @Transactional
-    public CreateProductDto createProduct(Products products) {
+    public void createProduct(Products products) {
 
         log.info("상품 row 생성");
         // 상품 row 생성
@@ -190,8 +193,20 @@ public class ProductAdaptor implements CreateProductPort {
             }
         }
 
-        CreateProductDto createProductDto = CreateProductDto.fromProductDetailId(productDetailIds);
+        log.info("판매자 상품리스트 생성");
+        //판매자 상품 리스트 생성
+        for(int i = 0 ; i < productDetailIds.size(); i++){
+            VendorProductEntity vendorProductEntity = VendorProductEntity.createVendorProductEntity(
+                    products.getVendorEmail(),
+                    productDetailRepository.findById(productDetailIds.get(i)).get(),
+                    1,
+                    2,
+                    0,
+                    0
+            );
 
-        return createProductDto;
+            vendorProductRepository.save(vendorProductEntity);
+        }
+
     }
 }

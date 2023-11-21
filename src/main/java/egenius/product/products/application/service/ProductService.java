@@ -18,7 +18,7 @@ public class ProductService implements CreateProductUseCase {
     private final CreateProductPort createProductPort;
 
     @Override
-    public CreateProductDto createProduct(CreateProductQuery createProductQuery) {
+    public void createProduct(CreateProductQuery createProductQuery) {
 
         // 상품 코드 생성 (브랜드명 2글자 + 상품명 2글자 + 랜덤 숫자)
         String productCode = (createProductQuery.getBrandName().length() >= 2 ?
@@ -27,24 +27,21 @@ public class ProductService implements CreateProductUseCase {
                 createProductQuery.getProductName().substring(0,2)
                 : createProductQuery.getProductName()) + (int)(Math.random() * 10000);
 
-        CreateProductDto createProductDto =
-                createProductPort.createProduct(Products.createProduct(
-                createProductQuery.getVendorEmail(),
-                createProductQuery.getProductName(),
-                productCode,
-                createProductQuery.getProductPrice(),
-                createProductQuery.getBrandName(),
-                createProductQuery.getBrandLogoUrl(),
-                createProductQuery.getCategoryName(),
-                createProductQuery.getSizeName(),
-                createProductQuery.getColorName(),
-                createProductQuery.getMainImageUrl(),
-                createProductQuery.getThumbnailsImageUrl(),
-                createProductQuery.getExplainImageUrl(),
-                0
+        createProductPort.createProduct(Products.createProduct(
+            createProductQuery.getVendorEmail(),
+            createProductQuery.getProductName(),
+            productCode,
+            createProductQuery.getProductPrice(),
+            createProductQuery.getBrandName(),
+            createProductQuery.getBrandLogoUrl(),
+            createProductQuery.getCategoryName(),
+            createProductQuery.getSizeName(),
+            createProductQuery.getColorName(),
+            createProductQuery.getMainImageUrl(),
+            createProductQuery.getThumbnailsImageUrl(),
+            createProductQuery.getExplainImageUrl(),
+            0
         ));
-
-        return createProductDto;
 
     }
 }

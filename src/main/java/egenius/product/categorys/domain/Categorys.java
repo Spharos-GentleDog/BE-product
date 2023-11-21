@@ -42,9 +42,15 @@ public class Categorys {
     }
 
     //카테고리 조회 (중분류 카테고리 조회)
-    public static Categorys readChildCategory(String categoryName, String parentCategory){
+    public static Categorys readChildCategory(String parentCategory){
         return Categorys.builder()
-                .categoryName(categoryName)
+                .parentCategory(parentCategory)
+                .build();
+    }
+
+    // 하위 카테고리별 상품 개수 조회
+    public static Categorys readChildCategoryCount(String parentCategory){
+        return Categorys.builder()
                 .parentCategory(parentCategory)
                 .build();
     }
