@@ -10,8 +10,11 @@ import egenius.product.global.common.exception.BaseException;
 import egenius.product.global.common.response.BaseResponseStatus;
 import egenius.product.products.adaptor.infrastructure.mysql.entity.*;
 import egenius.product.products.adaptor.infrastructure.mysql.repository.*;
+import egenius.product.products.application.ports.in.query.FindProductQuery;
 import egenius.product.products.application.ports.out.dto.CreateProductDto;
+import egenius.product.products.application.ports.out.dto.FindProductDto;
 import egenius.product.products.application.ports.out.port.CreateProductPort;
+import egenius.product.products.application.ports.out.port.FindProductPort;
 import egenius.product.products.domain.Products;
 import egenius.product.sizes.adaptor.infrastructure.mysql.entity.SizeEntity;
 import egenius.product.sizes.adaptor.infrastructure.mysql.repository.SizesRepository;
@@ -28,7 +31,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ProductAdaptor implements CreateProductPort {
+public class ProductAdaptor implements CreateProductPort, FindProductPort {
 
     private final ProductRepository productRepository;
     private final FavoriteProductTotalRepository favoriteProductTotalRepository;
@@ -99,23 +102,29 @@ public class ProductAdaptor implements CreateProductPort {
 
         log.info("상품 - 카테고리 row 생성");
         //상품 - 카테고리 row 생성
-        for(int i = 0; i < products.getCategoryName().size(); i++) {
+        // 카테고리 이름으로 카테고리 엔티티 조회
+        Optional<ProductCategoryEntity> parentCategoryEntity =
+                categoryRepository.findByCategoryName(products.getCategoryName().get(0));
 
-            // 카테고리 이름으로 카테고리 엔티티 조회
-            Optional<ProductCategoryEntity> productCategoryEntity =
-                    categoryRepository.findByCategoryName(products.getCategoryName().get(i));
-
-            if(!productCategoryEntity.isPresent()) {
-                throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
-            }
-
-            // 카테고리 - 상품 리스트에 row 갱신
-            productCategoryListRepository.save(ProductCategoryListEntity.createProductCategoryList(
-                    productCategoryEntity.get(),
-                    productEntity
-            ));
-
+        if(!parentCategoryEntity.isPresent()) {
+            throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
         }
+
+        Optional<ProductCategoryEntity> childCategoryEntity =
+                categoryRepository.findByParentCategoryAndCategoryName(parentCategoryEntity.get(),
+                        products.getCategoryName().get(1));
+
+
+        // 카테고리 - 상품 리스트에 row 갱신
+        productCategoryListRepository.save(ProductCategoryListEntity.createProductCategoryList(
+                parentCategoryEntity.get(),
+                productEntity
+        ));
+        productCategoryListRepository.save(ProductCategoryListEntity.createProductCategoryList(
+                childCategoryEntity.get(),
+                productEntity
+        ));
+
 
         log.info("상품 -사이즈 row 생성");
         //상품 -사이즈 row 생성
@@ -194,5 +203,18 @@ public class ProductAdaptor implements CreateProductPort {
             vendorProductRepository.save(vendorProductEntity);
         }
 
+    }
+
+    //상품조회
+    @Override
+    public List<FindProductDto> findProduct(FindProductQuery findProductQuery) {
+
+
+        //상품 카테고리 아이디로 상품 아이디 조회
+        // 카테고리명 조회 (카테고리 Id로 all, new이면 전체 조회, 그외는 전체)
+
+
+
+        return null;
     }
 }

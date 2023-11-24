@@ -1,21 +1,28 @@
 package egenius.product.products.application.service;
 
 import egenius.product.products.application.ports.in.port.CreateProductUseCase;
+import egenius.product.products.application.ports.in.port.FindProductUseCase;
 import egenius.product.products.application.ports.in.query.CreateProductQuery;
+import egenius.product.products.application.ports.in.query.FindProductQuery;
 import egenius.product.products.application.ports.out.dto.CreateProductDto;
+import egenius.product.products.application.ports.out.dto.FindProductDto;
 import egenius.product.products.application.ports.out.port.CreateProductPort;
+import egenius.product.products.application.ports.out.port.FindProductPort;
 import egenius.product.products.domain.ProductDetails;
 import egenius.product.products.domain.Products;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductService implements CreateProductUseCase {
+public class ProductService implements CreateProductUseCase, FindProductUseCase {
 
     private final CreateProductPort createProductPort;
+    private final FindProductPort findProductPort;
 
     @Override
     public void createProduct(CreateProductQuery createProductQuery) {
@@ -43,5 +50,10 @@ public class ProductService implements CreateProductUseCase {
             0
         ));
 
+    }
+
+    @Override
+    public List<FindProductDto> findProduct(FindProductQuery findProductQuery) {
+        return findProductPort.findProduct(findProductQuery);
     }
 }

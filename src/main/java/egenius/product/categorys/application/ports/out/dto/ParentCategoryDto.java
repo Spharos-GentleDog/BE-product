@@ -7,14 +7,14 @@ import lombok.Getter;
 @Builder
 public class ParentCategoryDto {
 
-    private Integer parentCategoryId;
+    private Integer CategoryId;
     private String parentCategoryName;
 
     public static ParentCategoryDto fromParentCategoryDto(
-            Integer parentCategoryId, String parentCategoryName){
+            Integer CategoryId, String parentCategoryName){
 
         return ParentCategoryDto.builder()
-                .parentCategoryId(parentCategoryId)
+                .CategoryId(CategoryId)
                 .parentCategoryName(parentCategoryName)
                 .build();
     }
