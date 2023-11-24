@@ -101,6 +101,7 @@ public class ProductAdaptor implements CreateProductPort {
         //상품 - 카테고리 row 생성
         for(int i = 0; i < products.getCategoryName().size(); i++) {
 
+            // 카테고리 이름으로 카테고리 엔티티 조회
             Optional<ProductCategoryEntity> productCategoryEntity =
                     categoryRepository.findByCategoryName(products.getCategoryName().get(i));
 
@@ -108,22 +109,7 @@ public class ProductAdaptor implements CreateProductPort {
                 throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
             }
 
-            // 하위 카테고리일 경우 상위 카테고리도 같이 저장
-            if(productCategoryEntity.get().getParentCategory() != null){
-                Optional<ProductCategoryEntity> parentCategoryEntity =
-                        categoryRepository.findById(productCategoryEntity.get().getParentCategory().getId());
-
-                if(!parentCategoryEntity.isPresent()){
-                    throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
-                }
-
-                productCategoryListRepository.save(ProductCategoryListEntity.createProductCategoryList(
-                        parentCategoryEntity.get(),
-                        productEntity
-                ));
-
-            }
-
+            // 카테고리 - 상품 리스트에 row 갱신
             productCategoryListRepository.save(ProductCategoryListEntity.createProductCategoryList(
                     productCategoryEntity.get(),
                     productEntity
