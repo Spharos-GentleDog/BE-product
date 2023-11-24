@@ -7,12 +7,12 @@ import lombok.Getter;
 @Builder
 public class ReadChildCategoryDto {
 
-    private Integer CategoryId;
+    private Integer childCategoryId;
     private String childCategoryName;
 
-    public static ReadChildCategoryDto fromChildCategory(Integer CategoryId, String childCategoryName){
+    public static ReadChildCategoryDto fromChildCategory(Integer childCategoryId, String childCategoryName){
         return ReadChildCategoryDto.builder()
-                .CategoryId(CategoryId)
+                .childCategoryId(childCategoryId)
                 .childCategoryName(childCategoryName)
                 .build();
     }
