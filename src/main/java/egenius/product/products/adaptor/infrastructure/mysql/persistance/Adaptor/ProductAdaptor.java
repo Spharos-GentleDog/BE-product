@@ -110,9 +110,16 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
             throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
         }
 
-        Optional<ProductCategoryEntity> childCategoryEntity =
-                categoryRepository.findByParentCategoryAndCategoryName(parentCategoryEntity.get(),
-                        products.getCategoryName().get(1));
+        if(products.getCategoryName().size() != 1){
+            Optional<ProductCategoryEntity> childCategoryEntity =
+                    categoryRepository.findByParentCategoryAndCategoryName(parentCategoryEntity.get(),
+                            products.getCategoryName().get(1));
+
+            productCategoryListRepository.save(ProductCategoryListEntity.createProductCategoryList(
+                    childCategoryEntity.get(),
+                    productEntity
+            ));
+        }
 
 
         // 카테고리 - 상품 리스트에 row 갱신
@@ -120,10 +127,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
                 parentCategoryEntity.get(),
                 productEntity
         ));
-        productCategoryListRepository.save(ProductCategoryListEntity.createProductCategoryList(
-                childCategoryEntity.get(),
-                productEntity
-        ));
+
 
 
         log.info("상품 -사이즈 row 생성");
@@ -210,9 +214,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
     public List<FindProductDto> findProduct(FindProductQuery findProductQuery) {
 
 
-        //상품 카테고리 아이디로 상품 아이디 조회
-        // 카테고리명 조회 (카테고리 Id로 all, new이면 전체 조회, 그외는 전체)
-
+        //
 
 
         return null;

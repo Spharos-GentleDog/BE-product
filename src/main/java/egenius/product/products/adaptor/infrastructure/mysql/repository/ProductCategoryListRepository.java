@@ -7,14 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductCategoryListRepository extends JpaRepository<ProductCategoryListEntity, Long> {
 
     // 상품 판매 여부가 삭제면 해당 개수는 카운트 조회 되지 않게 해야 한다 (삭제된 상품은 카테고리에 노출되지 않는다)
     @Query("select count(p) from ProductCategoryListEntity p where p.categoryId = :categoryId")
-    Integer findByCategoryId(@Param("categoryId") ProductCategoryEntity productCategoryEntity);
+    Integer countActiveProductsByCategoryId(@Param("categoryId") ProductCategoryEntity productCategoryEntity);
 
-    Optional<ProductCategoryListEntity> findByCategoryIdAndProductId(ProductCategoryEntity productCategoryEntity,
-                                                                        ProductEntity productEntity);
+    List<ProductCategoryListEntity> findByCategoryId(ProductCategoryEntity productCategoryEntity);
 }
