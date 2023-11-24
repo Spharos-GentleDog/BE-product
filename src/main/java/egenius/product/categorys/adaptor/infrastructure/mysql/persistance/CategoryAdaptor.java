@@ -137,7 +137,7 @@ public class CategoryAdaptor implements CreateParentCategoryPort, CreateChildCat
                 productCategoryEntityList.stream()
                         .map(productCategoryEntity -> {
 
-                            Integer count = productCategoryListRepository.findByCategoryId(productCategoryEntity);
+                            Integer count = productCategoryListRepository.countActiveProductsByCategoryId(productCategoryEntity);
                             log.info("count : {}",count);
                             return ReadChildCategoryCountDto.fromChildCategory(
                                     productCategoryEntity.getId(),

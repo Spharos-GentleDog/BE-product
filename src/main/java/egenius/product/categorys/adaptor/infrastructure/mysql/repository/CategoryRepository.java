@@ -16,4 +16,7 @@ public interface CategoryRepository extends JpaRepository<ProductCategoryEntity,
 
     // 자식 카테고리 조회
     List<ProductCategoryEntity> findByParentCategory(ProductCategoryEntity productCategoryEntity);
+
+    Optional<ProductCategoryEntity> findByParentCategoryAndCategoryName(ProductCategoryEntity parentCategoryEntity,
+                                                                        String categoryName);
 }
