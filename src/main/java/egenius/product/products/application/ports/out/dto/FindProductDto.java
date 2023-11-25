@@ -9,31 +9,36 @@ import java.util.List;
 @Builder
 public class FindProductDto {
 
-    private Integer productId; // 상품 ID
+    private Long productId; // 상품 ID
     private String productName; // 상품명
     private Integer productPrice; // 상품 가격
+    private String MainImageName; // 메인 이미지 이름
     private String MainImageUrl; // 메인 이미지 Url
     private String brandName; // 브랜드명
-    private Integer discountRate; // 할인율
-    private Integer discountType; // 할인 가격
+    private List<DiscountsDto> discounts; // 할인 정보
+    private Integer discountMinPrice; // 최소 할인 가격
+    private Integer discountMaxPrice; // 최대 할인 가격
     private Integer totalFavorite; // 총 좋아요 수
     private List<String> Sizes; // 사이즈
     private List<String> Colors; //
     private String salesStatus; // 판매 상태 (0: 판매중, 1: 품절, 2: 판매중지)
 
 
-    public static FindProductDto formfindProducrDto(Integer productId, String productName, Integer productPrice,
-                                                      String MainImageUrl, String brandName, Integer discountRate,
-                                                      Integer discountType, Integer totalFavorite, List<String> Sizes,
-                                                      List<String> Colors, String salesStatus) {
+    public static FindProductDto formFindProductDto(Long productId, String productName, Integer productPrice,
+                                                    String MainImageName, String MainImageUrl, String brandName,
+                                                    List<DiscountsDto> discounts, Integer discountMinPrice,
+                                                    Integer discountMaxPrice, Integer totalFavorite,
+                                                    List<String> Sizes, List<String> Colors, String salesStatus) {
         return FindProductDto.builder()
                 .productId(productId)
                 .productName(productName)
                 .productPrice(productPrice)
+                .MainImageName(MainImageName)
                 .MainImageUrl(MainImageUrl)
                 .brandName(brandName)
-                .discountRate(discountRate)
-                .discountType(discountType)
+                .discounts(discounts)
+                .discountMinPrice(discountMinPrice)
+                .discountMaxPrice(discountMaxPrice)
                 .totalFavorite(totalFavorite)
                 .Sizes(Sizes)
                 .Colors(Colors)

@@ -17,4 +17,5 @@ public interface ProductCategoryListRepository extends JpaRepository<ProductCate
     Integer countActiveProductsByCategoryId(@Param("categoryId") ProductCategoryEntity productCategoryEntity);
 
     List<ProductCategoryListEntity> findByCategoryId(ProductCategoryEntity productCategoryEntity);
+
 }
