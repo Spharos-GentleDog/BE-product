@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductThumbnailsRepository extends JpaRepository<ProductThumbnailsEntity, Long> {
     ProductThumbnailsEntity findByProductIdAndUsedMainImage(ProductEntity productEntity, Integer usedMainImage);
+
 }
