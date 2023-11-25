@@ -111,15 +111,17 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
             throw new BaseException(BaseResponseStatus.NOT_FOUND_CATEGORY);
         }
 
-        if(products.getCategoryName().get(1) != "" || products.getCategoryName().get(1) != null){
+        if(products.getCategoryName().size() > 1){
             Optional<ProductCategoryEntity> childCategoryEntity =
                     categoryRepository.findByParentCategoryAndCategoryName(parentCategoryEntity.get(),
                             products.getCategoryName().get(1));
+            if (childCategoryEntity.isPresent()) {
+                productCategoryListRepository.save(ProductCategoryListEntity.createProductCategoryList(
+                        childCategoryEntity.get(),
+                        productEntity
+                ));
+            }
 
-            productCategoryListRepository.save(ProductCategoryListEntity.createProductCategoryList(
-                    childCategoryEntity.get(),
-                    productEntity
-            ));
         }
 
 
