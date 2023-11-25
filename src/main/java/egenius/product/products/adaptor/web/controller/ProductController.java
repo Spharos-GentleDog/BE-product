@@ -53,7 +53,10 @@ public class ProductController {
                                        @RequestParam("page") Integer page){
 
         log.info("상품 조회");
-        findProductUseCase.findProduct(FindProductQuery.toQuery(
+
+
+        return new BaseResponse<>(findProductUseCase.findProduct(
+                FindProductQuery.toQuery(
                 categoryType,
                 CategoryId,
                 sizeName,
@@ -63,9 +66,7 @@ public class ProductController {
                 maxPrice,
                 isDiscount,
                 page
-        ));
-
-        return new BaseResponse<>();
+        )));
     }
 
 

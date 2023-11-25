@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -217,94 +218,156 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
     public List<FindProductDto> findProduct(FindProductQuery findProductQuery) {
 
         // 카테고리에 해당하는 상품 불러오기
-//        List<ProductCategoryListEntity> productIds = productCategoryListRepository.findByCategoryId(
-//                categoryRepository.findById(findProductQuery.getCategoryId()).get()
-//        );
+        List<ProductCategoryListEntity> productIds = productCategoryListRepository.findByCategoryId(
+                categoryRepository.findById(findProductQuery.getCategoryId()).get()
+        );
+
+        log.info("상품 조회:{}",productIds);
+        // 상품 테이블에서 데이터 가져오기 ( 상품 id, 상품이름, 상품가격, 브랜드 이름)
+        List<ProductEntity> productEntities =
+                productIds.stream()
+                .map(ProductCategoryListEntity ->  ProductCategoryListEntity.getProductId())
+                .collect(Collectors.toList());
+
+
+        List<FindProductDto> findProductDtos =
+                productEntities.stream()
+                .map(ProductEntity -> {
+
+                    // 상품 세부 조회 (상품 세부 코드, 할인률, 할인액)
+                    // 할인 중인 상품
+                    List<ProductDetailEntity> productDetailEntity;
+                    if (findProductQuery.getIsDiscount()) {
+                        // 할인 중인 상품이 없으면 null 반환
+                        productDetailEntity = productDetailRepository.discsountProductByProductId(ProductEntity.getId());
+                        log.info("할인중인 상품 :{}", productDetailEntity);
+                        if (productDetailEntity.isEmpty()) {
+                            return null;
+                        }
+
+                    } else {
+                        // 할인 중인 상품이 있으면 null 반환
+                        productDetailEntity = productDetailRepository.noDiscsountProductByProductId(ProductEntity.getId());
+                        log.info("할인중 상품 :{}", productDetailEntity);
+                        if (productDetailEntity.isEmpty()) {
+                            return null;
+                        }
+                    }
+
+
+
+                    List<String> sizeNames = new ArrayList<>();
+                    List<String> colorNames = new ArrayList<>();
+                    String salesStatus = null;
+                    List<DiscountsDto> discountsDtos = null;
+                    List<Integer> salesStatusList =
+                            productDetailEntity.stream()
+                                    .map(ProductDetailEntity -> {
+                                        VendorProductEntity vendorProductEntity =
+                                                vendorProductRepository.findByProductDetailId(ProductDetailEntity);
+
+                                        if (vendorProductEntity.getSalesStatus() == 2 || vendorProductEntity.getSalesStatus() == 3
+                                                || vendorProductEntity.getSalesStatus() == 4)
+                                            return 0;
+                                        return vendorProductEntity.getSalesStatus();
+                                    })
+                                    .filter(Objects::nonNull)
+                                    .collect(Collectors.toList());
+
+                    if (salesStatusList.contains(1)) {
+                        salesStatus = "판매중";
+                        discountsDtos =
+                                productDetailEntity.stream()
+                                        .map(ProductDetailEntity -> {
+
+                                            VendorProductEntity vendorProductEntity =
+                                                    vendorProductRepository.findByProductDetailId(ProductDetailEntity);
+
+                                            if (vendorProductEntity.getSalesStatus() == 1) {
+                                                sizeNames.add(ProductDetailEntity.getSize());
+                                                colorNames.add(ProductDetailEntity.getColor());
+                                                return DiscountsDto.formDiscountsDto(
+                                                        ProductDetailEntity.getId(),
+                                                        ProductDetailEntity.getDiscountRate(),
+                                                        ProductDetailEntity.getDiscountTypes());
+                                            }
+                                            return null;
+                                        })
+                                        .filter(Objects::nonNull)
+                                        .collect(Collectors.toList());
+
+                    }
+
+                    if (salesStatus == null) {
+                        return null;
+                    }
+                    else{
+
+                        log.info("할인정보 :{}", discountsDtos);
+                        // 상품 대표이미지 조회 (이미지 이름, 이미지 url)
+                        ProductThumbnailsEntity productThumbnailsEntity =
+                                productThumbnailsRepository.findByProductIdAndUsedMainImage(ProductEntity, 1);
+
+                        log.info("대표이미지 :{}", productThumbnailsEntity);
+                        //찜수 조회 (찜수)
+                        FavoriteProductTotalEntity favoriteProductTotalEntity =
+                                favoriteProductTotalRepository.findByProductId(ProductEntity);
+
+                        log.info("찜수 :{}", favoriteProductTotalEntity);
+//                        // 사이즈 옵션들 조회 (사이즈 옵션들 조회)
+//                        List<SizeEntity> sizeEntities =
+//                                productSizeListRepository.findByProductId(ProductEntity)
+//                                        .stream()
+//                                        .map(ProductSizeListEntity -> ProductSizeListEntity.getSizeId())
+//                                        .filter(Objects::nonNull)
+//                                        .collect(Collectors.toList());
+//                        log.info("사이즈 :{}", sizeEntities);
+//                        List<String> sizeNames =
+//                                sizeEntities.stream()
+//                                        .map(SizeEntity -> SizeEntity.getSizeName())
+//                                        .filter(Objects::nonNull)
+//                                        .collect(Collectors.toList());
 //
-//        log.info("상품 조회:{}",productIds);
-//        // 상품 테이블에서 데이터 가져오기 ( 상품 id, 상품이름, 상품가격, 브랜드 이름)
-//        List<ProductEntity> productEntities =
-//                productIds.stream()
-//                .map(ProductCategoryListEntity ->  ProductCategoryListEntity.getProductId())
-//                .collect(Collectors.toList());
+//                        log.info("사이즈 :{}", sizeNames);
+//                        // 색상 옵션들 조회 (색상 옵션들 조회)
+//                        List<ColorEntity> colorEntities =
+//                                productColorListRepository.findByProductId(ProductEntity)
+//                                        .stream()
+//                                        .map(ProductColorListEntity -> ProductColorListEntity.getColorId())
+//                                        .filter(Objects::nonNull)
+//                                        .collect(Collectors.toList());
 //
-//
-//        List<FindProductDto> findProductDtos =
-//                productEntities.stream()
-//                .map(ProductEntity -> {
-//
-//                    // 상품 세부 조회 (상품 세부 코드, 할인률, 할인액)
-//                    // 할인 중인 상품
-//                    List<ProductDetailEntity> productDetailEntity;
-//                    if (findProductQuery.getIsDiscount()){
-//                        // 할인 중인 상품이 없으면 null 반환
-//                        productDetailEntity = productDetailRepository.discsountProductByProductId(ProductEntity.getId());
-//
-//                        if(productDetailEntity.isEmpty()){
-//                            return null;
-//                        }
-//
-//                    }else{
-//                        // 할인 중인 상품이 있으면 null 반환
-//                        productDetailEntity = productDetailRepository.discsountProductByProductId(ProductEntity.getId());
-//
-//                        if(!productDetailEntity.isEmpty()){
-//                            return null;
-//                        }
-//                    }
-//
-//                    List<DiscountsDto> discountsDtos =
-//                            productDetailEntity.stream()
-//                            .map(ProductDetailEntity -> DiscountsDto.formDiscountsDto(
-//                                    ProductDetailEntity.getId(),
-//                                    ProductDetailEntity.getDiscountRate(),
-//                                    ProductDetailEntity.getDiscountTypes()
-//                            ))
-//                            .collect(Collectors.toList());
-//
-//
-//                    // 상품 대표이미지 조회 (이미지 이름, 이미지 url)
-//                    ProductThumbnailsEntity productThumbnailsEntity =
-//                            productThumbnailsRepository.findByProductIdAndUsedMainImage(ProductEntity, 1);
-//
-//                    //찜수 조회 (찜수)
-//                    FavoriteProductTotalEntity favoriteProductTotalEntity =
-//                            favoriteProductTotalRepository.findByProductId(ProductEntity);
-//
-//
-//                    // 사이즈 옵션들 조회 (사이즈 옵션들 조회)
-//                    List<SizeEntity> sizeEntities =
-//                            productSizeListRepository.findByProductId(ProductEntity)
-//                            .stream()
-//                            .map(ProductSizeListEntity ->ProductSizeListEntity.getSizeId())
-//                            .collect(Collectors.toList());
-//
-//
-//                    // 색상 옵션들 조회 (색상 옵션들 조회)
-//                    List<ColorEntity> colorEntities =
-//                            productColorListRepository.findByProductId(ProductEntity)
-//                            .stream()
-//                            .map(ProductColorListEntity -> ProductColorListEntity.getColorId())
-//                            .collect(Collectors.toList());
-//
-//                    return FindProductDto.formFindProductDto(
-//                            ProductEntity.getId(),
-//                            ProductEntity.getProductName(),
-//                            ProductEntity.getProductPrice(),
-//                            productThumbnailsEntity.getThumbnailsImageName(),
-//                            productThumbnailsEntity.getThumbnailsImageUrl(),
-//                            ProductEntity.getBrandName(),
-//
-//                            favoriteProductTotalEntity.getTotalFavorite(),
-//                            sizeEntities,
-//                            colorEntities
-//                    );
-//
-//
-//                })
-//                .collect(Collectors.toList());
-//
-////        log.info("상품 조회:{}",productEntities.getBrandName());
-        return null;
+//                        log.info("색상 :{}", colorEntities);
+//                        List<String> colorNames =
+//                                colorEntities.stream()
+//                                        .map(ColorEntity -> ColorEntity.getColorName())
+//                                        .filter(Objects::nonNull)
+//                                        .collect(Collectors.toList());
+
+
+                        // 판매여부 조회
+
+
+                        return FindProductDto.formFindProductDto(
+                                ProductEntity.getId(),
+                                ProductEntity.getProductName(),
+                                ProductEntity.getProductPrice(),
+                                productThumbnailsEntity.getThumbnailsImageName(),
+                                productThumbnailsEntity.getThumbnailsImageUrl(),
+                                ProductEntity.getBrandName(),
+                                discountsDtos,
+                                favoriteProductTotalEntity.getTotalFavorite(),
+                                sizeNames.stream().distinct().collect(Collectors.toList()),
+                                colorNames.stream().distinct().collect(Collectors.toList()), 
+                                salesStatus
+                        );
+                    }
+
+                })
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+
+//        log.info("상품 조회:{}",productEntities.getBrandName());
+        return findProductDtos;
     }
 }
