@@ -17,4 +17,6 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetailEnti
 
     @Query(value = "SELECT * FROM product_details where product_id = :productId and discount_rate is null", nativeQuery = true)
     List<ProductDetailEntity> noDiscsountProductByProductId(@Param("productId") Long productId);
+
+    List<ProductDetailEntity> findByProductId(ProductEntity productEntity);
 }

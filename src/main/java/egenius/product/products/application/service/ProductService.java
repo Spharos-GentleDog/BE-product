@@ -1,15 +1,9 @@
 package egenius.product.products.application.service;
 
-import egenius.product.products.application.ports.in.port.CreateProductUseCase;
-import egenius.product.products.application.ports.in.port.FindProductDetailUseCase;
-import egenius.product.products.application.ports.in.port.FindProductUseCase;
-import egenius.product.products.application.ports.in.port.OrderProductDetailUseCase;
+import egenius.product.products.application.ports.in.port.*;
 import egenius.product.products.application.ports.in.query.*;
 import egenius.product.products.application.ports.out.dto.*;
-import egenius.product.products.application.ports.out.port.CreateProductPort;
-import egenius.product.products.application.ports.out.port.FindProductDetailPort;
-import egenius.product.products.application.ports.out.port.FindProductPort;
-import egenius.product.products.application.ports.out.port.OrderProductInfoPort;
+import egenius.product.products.application.ports.out.port.*;
 import egenius.product.products.domain.ProductDetails;
 import egenius.product.products.domain.Products;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +16,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductService implements CreateProductUseCase, FindProductUseCase, FindProductDetailUseCase,
-        OrderProductDetailUseCase {
+        OrderProductDetailUseCase, ProductDetailPageUseCase {
 
     private final CreateProductPort createProductPort;
     private final FindProductPort findProductPort;
     private final FindProductDetailPort findProductDetailPort;
     private final OrderProductInfoPort orderProductInfoPort;
+    private final ProductDetailPagePort productDetailPagePort;
 
     @Override
     public void createProduct(CreateProductQuery createProductQuery) {
@@ -70,5 +65,10 @@ public class ProductService implements CreateProductUseCase, FindProductUseCase,
     @Override
     public OrderProductInfoBrandDto orderProductDetail(OrderProductInfoBrandQuery orderProductInfoBrandQuery) {
         return orderProductInfoPort.orderProductInfo(orderProductInfoBrandQuery);
+    }
+
+    @Override
+    public ProductDetailPageDto getProductDetailPage(Long productId) {
+        return productDetailPagePort.getProductDetailPage(productId);
     }
 }

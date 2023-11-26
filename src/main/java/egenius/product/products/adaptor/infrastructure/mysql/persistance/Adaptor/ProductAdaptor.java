@@ -14,10 +14,8 @@ import egenius.product.products.application.ports.in.query.FindProductListQuery;
 import egenius.product.products.application.ports.in.query.FindProductQuery;
 import egenius.product.products.application.ports.in.query.OrderProductInfoBrandQuery;
 import egenius.product.products.application.ports.out.dto.*;
-import egenius.product.products.application.ports.out.port.CreateProductPort;
-import egenius.product.products.application.ports.out.port.FindProductDetailPort;
-import egenius.product.products.application.ports.out.port.FindProductPort;
-import egenius.product.products.application.ports.out.port.OrderProductInfoPort;
+import egenius.product.products.application.ports.out.port.*;
+import egenius.product.products.domain.ImageInfo;
 import egenius.product.products.domain.Products;
 import egenius.product.sizes.adaptor.infrastructure.mysql.entity.SizeEntity;
 import egenius.product.sizes.adaptor.infrastructure.mysql.repository.SizesRepository;
@@ -34,7 +32,8 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ProductAdaptor implements CreateProductPort, FindProductPort, FindProductDetailPort, OrderProductInfoPort {
+public class ProductAdaptor implements CreateProductPort, FindProductPort, FindProductDetailPort, OrderProductInfoPort,
+        ProductDetailPagePort {
 
     private final ProductRepository productRepository;
     private final FavoriteProductTotalRepository favoriteProductTotalRepository;
@@ -48,6 +47,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
     private final ProductColorListRepository productColorListRepository;
     private final ProductDetailRepository productDetailRepository;
     private final VendorProductRepository vendorProductRepository;
+
 
 
     @Override
@@ -582,6 +582,125 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
                 discountTotalInt,
                 totalPrice,
                 orderProductInfoListDtos
+        );
+    }
+
+    @Override
+    public ProductDetailPageDto getProductDetailPage(Long productId) {
+
+        // 상품 데이터 가져오기
+        Optional<ProductEntity> productEntityOptional = productRepository.findById(productId);
+        ProductEntity productEntity = productEntityOptional.get();
+
+        //상품 썸네일 이미지  가져오기
+        List<ProductThumbnailsEntity> productThumbnailsEntities =
+                productThumbnailsRepository.findByProductId(productEntity);
+
+        List<ImageInfoDto> tumbnailImageInfos =
+                productThumbnailsEntities.stream()
+                        .map(ProductThumbnailsEntity -> {
+                            return ImageInfoDto.formImageInfoDto(
+                                    ProductThumbnailsEntity.getThumbnailsImageName(),
+                                    ProductThumbnailsEntity.getThumbnailsImageUrl()
+                            );
+                        })
+                        .collect(Collectors.toList());
+
+        //상품 상세 이미지 가져오기
+        List<ProductExplainImageEntity> productExplainImageEntities =
+                productExplainImageRepository.findByProductId(productEntity);
+
+        List<ImageInfoDto> explainImageInfos =
+                productExplainImageEntities.stream()
+                        .map(ProductExplainImageEntity -> {
+                            return ImageInfoDto.formImageInfoDto(
+                                    ProductExplainImageEntity.getExplainImageName(),
+                                    ProductExplainImageEntity.getExplainImageUrl()
+                            );
+                        })
+                        .collect(Collectors.toList());
+
+        //상품 상세 가져오기
+        // 판매자 - 상품 에서 판매중인 세부 상품만 가져오기
+        List<ProductDetailEntity> productDetailEntities =
+                productDetailRepository.findByProductId(productEntity);
+
+        List<ProductDetailEntity> productDetailIds =
+                productDetailEntities.stream()
+                                .map(ProductDetailEntity -> {
+                                    VendorProductEntity vendorProductEntity =
+                                            vendorProductRepository.findByProductDetailId(ProductDetailEntity);
+                                    if(vendorProductEntity.getSalesStatus() == 1){
+                                        log.info("상품 세부 :{}", ProductDetailEntity.getColor());
+                                        return ProductDetailEntity;
+                                    }
+                                    return null;
+                                })
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList());
+
+        log.info("상품 세부 :{}", productDetailIds);
+        List<ProductDetailPageOptionsDto> productDetailPageOptionsDtos =
+                productDetailIds.stream()
+                        .map(productDetailEntity -> {
+                            return ProductDetailPageOptionsDto.formProductDetailPageOptionsDto(
+                                    productDetailEntity.getId(),
+                                    productDetailEntity.getDiscountRate(),
+                                    productDetailEntity.getDiscountTypes(),
+                                    productDetailEntity.getSize(),
+                                    productDetailEntity.getColor()
+
+                            );
+                        })
+                        .collect(Collectors.toList());
+
+
+
+        // 상품 색상 가져오기
+        List<ColorEntity> colorEntities =
+                productDetailIds.stream()
+                                .map(ProductDetailEntity -> {
+                                    ColorEntity colorEntity =
+                                            colorRepository.findByColorName(ProductDetailEntity.getColor()).get();
+                                    return colorEntity;
+                                })
+                        .distinct()
+                        .collect(Collectors.toList());
+
+        List<ColorDto> colorDtos =
+                colorEntities.stream()
+                        .map(ColorEntity -> ColorDto.formColorDto(
+                                ColorEntity.getColorName(),
+                                ColorEntity.getColorCode()
+                        ))
+                        .collect(Collectors.toList());
+
+        // 상품 사이즈 가져오기
+        List<String> sizeNames =
+                productDetailIds.stream()
+                        .map(ProductDetailEntity -> ProductDetailEntity.getSize())
+                        .distinct()
+                        .collect(Collectors.toList());
+
+        // 상품 좋아요 수 가져오기
+        FavoriteProductTotalEntity favoriteProductTotalEntity =
+                favoriteProductTotalRepository.findByProductId(productEntity);
+
+
+
+
+        return ProductDetailPageDto.formProductDetailPageDto(
+                productEntity.getId(),
+                productEntity.getProductName(),
+                productEntity.getProductPrice(),
+                tumbnailImageInfos,
+                explainImageInfos,
+                productEntity.getBrandName(),
+                productEntity.getBrandLogoUrl(),
+                productDetailPageOptionsDtos,
+                colorDtos,
+                sizeNames,
+                favoriteProductTotalEntity.getTotalFavorite()
         );
     }
 }

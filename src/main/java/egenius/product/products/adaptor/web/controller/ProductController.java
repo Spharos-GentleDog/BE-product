@@ -2,11 +2,9 @@ package egenius.product.products.adaptor.web.controller;
 
 import egenius.product.global.common.response.BaseResponse;
 import egenius.product.products.adaptor.web.request.*;
-import egenius.product.products.application.ports.in.port.CreateProductUseCase;
-import egenius.product.products.application.ports.in.port.FindProductDetailUseCase;
-import egenius.product.products.application.ports.in.port.FindProductUseCase;
-import egenius.product.products.application.ports.in.port.OrderProductDetailUseCase;
+import egenius.product.products.application.ports.in.port.*;
 import egenius.product.products.application.ports.in.query.*;
+import egenius.product.products.application.ports.out.dto.ProductDetailPageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.http.io.ResponseOutOfOrderStrategy;
@@ -24,6 +22,7 @@ public class ProductController {
     private final FindProductUseCase findProductUseCase;
     private final FindProductDetailUseCase findProductDetailUseCase;
     private final OrderProductDetailUseCase orderProductDetailUseCase;
+    private final ProductDetailPageUseCase productDetailPageUseCase;
 
     @PostMapping("/product-create")
     public BaseResponse<?> productCreate(@RequestBody RequestCreateProduct requestCreateProduct){
@@ -111,6 +110,13 @@ public class ProductController {
         );
 
         return new BaseResponse<>(orderProductDetailUseCase.orderProductDetail(orderProductInfoBrandQuery));
+    }
+
+    @GetMapping("/product-detail-page")
+    public BaseResponse<?> productDetail(@RequestParam("productId") Long productId){
+        log.info("상품 상세 조회");
+
+        return new BaseResponse<>(productDetailPageUseCase.getProductDetailPage(productId));
     }
 
 

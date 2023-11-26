@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface ProductColorListRepository extends JpaRepository<ProductColorListEntity, Long> {
     List<ProductColorListEntity> findByProductId(ProductEntity productEntity);
+
 }

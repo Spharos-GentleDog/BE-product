@@ -2,8 +2,10 @@ package egenius.product.VendorProduct.adaptor.infrastructure.mysql.repository;
 
 import egenius.product.VendorProduct.adaptor.infrastructure.mysql.entity.VendorProductEntity;
 import egenius.product.products.adaptor.infrastructure.mysql.entity.ProductDetailEntity;
+import egenius.product.products.adaptor.infrastructure.mysql.entity.ProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface VendorProductRepository extends JpaRepository<VendorProductEntity, Long> {
@@ -13,4 +15,5 @@ public interface VendorProductRepository extends JpaRepository<VendorProductEnti
     List<VendorProductEntity> findAllByVendorEmail(String vendorEmail);
 
     VendorProductEntity findByProductDetailId(ProductDetailEntity productDetailId);
+
 }
