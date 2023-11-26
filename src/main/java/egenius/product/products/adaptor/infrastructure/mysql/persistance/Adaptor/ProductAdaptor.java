@@ -358,7 +358,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
                                 discountsDtos,
                                 favoriteProductTotalEntity.getTotalFavorite(),
                                 sizeNames.stream().distinct().collect(Collectors.toList()),
-                                colorNames.stream().distinct().collect(Collectors.toList()), 
+                                colorNames.stream().distinct().collect(Collectors.toList()),
                                 salesStatus
                         );
                     }
