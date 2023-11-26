@@ -44,29 +44,37 @@ public class ProductController {
     @GetMapping("/product-find")
     public BaseResponse<?> productFind(@RequestParam("categoryType") String categoryType,
                                        @RequestParam("CategoryId") Integer CategoryId,
-                                       @RequestParam("sizeName") String sizeName,
-                                       @RequestParam("colorName") String colorName,
-                                       @RequestParam("productType") String productType,
-                                       @RequestParam("minPrice") Integer minPrice,
-                                       @RequestParam("maxPrice") Integer maxPrice,
+//                                       @RequestParam("sizeName") String sizeName,
+//                                       @RequestParam("colorName") String colorName,
+//                                       @RequestParam("productType") String productType,
+//                                       @RequestParam("minPrice") Integer minPrice,
+//                                       @RequestParam("maxPrice") Integer maxPrice,
                                        @RequestParam("isDiscount") Boolean isDiscount,
                                        @RequestParam("page") Integer page){
 
         log.info("상품 조회");
-        findProductUseCase.findProduct(FindProductQuery.toQuery(
+
+
+        return new BaseResponse<>(findProductUseCase.findProduct(
+                FindProductQuery.toQuery(
                 categoryType,
                 CategoryId,
-                sizeName,
-                colorName,
-                productType,
-                minPrice,
-                maxPrice,
+//                sizeName,
+//                colorName,
+//                productType,
+//                minPrice,
+//                maxPrice,
                 isDiscount,
                 page
-        ));
-
-        return new BaseResponse<>();
+        )));
     }
+
+//    @GetMapping("/find-product-detail")
+//    public BaseResponse<?> findProductDetail(@RequestParam("productCode") String productCode){
+//        log.info("상품 상세 조회");
+//
+//        return new BaseResponse<>(findProductUseCase.findProductDetail(productCode));
+//    }
 
 
 }
