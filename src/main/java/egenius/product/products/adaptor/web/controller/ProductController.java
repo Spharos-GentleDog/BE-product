@@ -1,18 +1,15 @@
 package egenius.product.products.adaptor.web.controller;
 
 import egenius.product.global.common.response.BaseResponse;
-import egenius.product.products.adaptor.web.request.RequestBrandProductList;
-import egenius.product.products.adaptor.web.request.RequestCreateProduct;
-import egenius.product.products.adaptor.web.request.RequestProducts;
+import egenius.product.products.adaptor.web.request.*;
 import egenius.product.products.application.ports.in.port.CreateProductUseCase;
 import egenius.product.products.application.ports.in.port.FindProductDetailUseCase;
 import egenius.product.products.application.ports.in.port.FindProductUseCase;
-import egenius.product.products.application.ports.in.query.CreateProductQuery;
-import egenius.product.products.application.ports.in.query.FindProductDetailQuery;
-import egenius.product.products.application.ports.in.query.FindProductListQuery;
-import egenius.product.products.application.ports.in.query.FindProductQuery;
+import egenius.product.products.application.ports.in.port.OrderProductDetailUseCase;
+import egenius.product.products.application.ports.in.query.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hc.core5.http.io.ResponseOutOfOrderStrategy;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
@@ -26,6 +23,7 @@ public class ProductController {
     private final CreateProductUseCase createProductUseCase;
     private final FindProductUseCase findProductUseCase;
     private final FindProductDetailUseCase findProductDetailUseCase;
+    private final OrderProductDetailUseCase orderProductDetailUseCase;
 
     @PostMapping("/product-create")
     public BaseResponse<?> productCreate(@RequestBody RequestCreateProduct requestCreateProduct){
@@ -91,6 +89,28 @@ public class ProductController {
                                 .collect(Collectors.toList()));
 
         return new BaseResponse<>(findProductDetailUseCase.findProductDetail(findProductListQuery));
+    }
+
+    @PostMapping("/order-product-info")
+    public BaseResponse<?> findOrderProductDetail(@RequestBody RequestOrderProductInfoBrand requestOrderProductInfoBrand){
+        log.info("주문 상품 상세 조회");
+
+        OrderProductInfoBrandQuery orderProductInfoBrandQuery =
+                OrderProductInfoBrandQuery.toQuery(
+                requestOrderProductInfoBrand.getRequestOrderProductInfoList().stream()
+                .map(requestOrderProductInfoList -> OrderProductInfoListQuery.toQuery(
+                        requestOrderProductInfoList.getBrandName(),
+                        requestOrderProductInfoList.getRequestOrderProductInfoList().stream()
+                                .map(requestOrderProductInfo -> OrderProductInfoQuery.toQuery(
+                                                requestOrderProductInfo.getProductDetailId(),
+                                                requestOrderProductInfo.getCount()
+                                )
+                                ).collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList())
+        );
+
+        return new BaseResponse<>(orderProductDetailUseCase.orderProductDetail(orderProductInfoBrandQuery));
     }
 
 
