@@ -12,10 +12,12 @@ import egenius.product.products.adaptor.infrastructure.mysql.entity.*;
 import egenius.product.products.adaptor.infrastructure.mysql.repository.*;
 import egenius.product.products.application.ports.in.query.FindProductListQuery;
 import egenius.product.products.application.ports.in.query.FindProductQuery;
+import egenius.product.products.application.ports.in.query.OrderProductInfoBrandQuery;
 import egenius.product.products.application.ports.out.dto.*;
 import egenius.product.products.application.ports.out.port.CreateProductPort;
 import egenius.product.products.application.ports.out.port.FindProductDetailPort;
 import egenius.product.products.application.ports.out.port.FindProductPort;
+import egenius.product.products.application.ports.out.port.OrderProductInfoPort;
 import egenius.product.products.domain.Products;
 import egenius.product.sizes.adaptor.infrastructure.mysql.entity.SizeEntity;
 import egenius.product.sizes.adaptor.infrastructure.mysql.repository.SizesRepository;
@@ -32,7 +34,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ProductAdaptor implements CreateProductPort, FindProductPort, FindProductDetailPort {
+public class ProductAdaptor implements CreateProductPort, FindProductPort, FindProductDetailPort, OrderProductInfoPort {
 
     private final ProductRepository productRepository;
     private final FavoriteProductTotalRepository favoriteProductTotalRepository;
@@ -221,14 +223,13 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
         List<ProductCategoryListEntity> productIds;
         if(findProductQuery.getCategoryType().equals("all") & findProductQuery.getCategoryId() == null){
             log.info("전체 조회:{}",findProductQuery.getCategoryType());
-            productIds = productCategoryListRepository.findAll();
+            productIds = productCategoryListRepository.findAllProductIds();
         }
         else {
             productIds = productCategoryListRepository.findByCategoryId(
                     categoryRepository.findById(findProductQuery.getCategoryId()).get()
             );
         }
-
 
         log.info("상품 조회:{}",productIds);
         // 상품 테이블에서 데이터 가져오기 ( 상품 id, 상품이름, 상품가격, 브랜드 이름)
@@ -471,11 +472,109 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
         Integer deliveryFeeInt = deliveryFee.get();
 
         return FindProductDetailDto.formFindProductDetailDto(
+//                originalTotalPriceInt,
+//                deliveryFeeInt,
+//                discountTotalInt,
+//                totalPrice,
+                productDetailBrandDtoList
+        );
+    }
+
+    @Override
+    public OrderProductInfoBrandDto orderProductInfo(OrderProductInfoBrandQuery orderProductInfoBrandQuery) {
+
+        //ProductDetailBrandDto 생성
+        AtomicInteger originalTotalPrice = new AtomicInteger(0);
+        AtomicInteger discountTotal = new AtomicInteger(0);
+        AtomicInteger deliveryFee = new AtomicInteger(0);
+        Integer totalPrice;
+
+        List<OrderProductInfoListDto> orderProductInfoListDtos =
+                orderProductInfoBrandQuery.getOrderProductInfoListQueries().stream()
+                        .map(OrderProductInfoList -> {
+
+                            String brandName = OrderProductInfoList.getBrandName();
+                            AtomicInteger brandTotalPrice = new AtomicInteger(0);
+                            AtomicInteger brandTotalDiscount = new AtomicInteger(0);
+
+                            List<OrderProductInfoDto> OrderProductInfoDtoList =
+                                    OrderProductInfoList.getOrderProductInfoQueries().stream()
+                                            .map(OrderProductInfo -> {
+                                                // 상품 세부 데이터 가져오기
+                                                Optional<ProductDetailEntity> productDetailEntityOptional =
+                                                        productDetailRepository.findById(OrderProductInfo.getProductDetailId());
+                                                ProductDetailEntity productDetailEntity = productDetailEntityOptional.get();
+
+                                                // 상품 데이터 가져오기
+                                                ProductEntity productEntity = productDetailEntity.getProductId();
+
+                                                // 상품 대표이미지 가져오기
+                                                ProductThumbnailsEntity productThumbnailsEntity =
+                                                        productThumbnailsRepository.findByProductIdAndUsedMainImage(
+                                                                productEntity, 1);
+
+                                                // 할인 후 금액 계산하기
+                                                Integer discountPrice = 0;
+                                                if (productDetailEntity.getDiscountRate() != null) {
+                                                    if (productDetailEntity.getDiscountTypes() == 1) {
+                                                        discountPrice = productEntity.getProductPrice() -
+                                                                productDetailEntity.getDiscountRate();
+                                                    } else if (productDetailEntity.getDiscountTypes() == 2) {
+                                                        discountPrice = productEntity.getProductPrice() -
+                                                                (productEntity.getProductPrice() * productDetailEntity.getDiscountRate() / 100);
+                                                    }
+                                                }
+
+                                                brandTotalPrice.addAndGet(productEntity.getProductPrice()*OrderProductInfo.getCount());
+                                                brandTotalDiscount.addAndGet(discountPrice * OrderProductInfo.getCount());
+
+                                                return OrderProductInfoDto.formOrderProductInfoDto(
+                                                        productEntity.getBrandName(),
+                                                        productEntity.getId(),
+                                                        productDetailEntity.getId(),
+                                                        productEntity.getProductName(),
+                                                        productDetailEntity.getColor(),
+                                                        productDetailEntity.getSize(),
+                                                        productDetailEntity.getDiscountRate(),
+                                                        productEntity.getProductPrice(),
+                                                        discountPrice,
+                                                        productThumbnailsEntity.getThumbnailsImageUrl(),
+                                                        productThumbnailsEntity.getThumbnailsImageName()
+                                                );
+
+                                            })
+                                            .collect(Collectors.toList());
+
+                            originalTotalPrice.addAndGet(brandTotalPrice.get());
+                            discountTotal.addAndGet(brandTotalDiscount.get());
+
+                            Integer brandDeliveryFee = 0;
+                            if (brandTotalPrice.get() < 50000) {
+                                brandDeliveryFee = 3000;
+                                deliveryFee.addAndGet(3000);
+                            }
+
+                            return OrderProductInfoListDto.formOrderProductInfoListDto(
+                                    brandName,
+                                    brandTotalPrice.get(),
+                                    brandDeliveryFee,
+                                    OrderProductInfoDtoList
+                            );
+                        })
+                        .collect(Collectors.toList());
+
+
+        totalPrice = originalTotalPrice.get() - discountTotal.get() + deliveryFee.get();
+        Integer originalTotalPriceInt = originalTotalPrice.get();
+        Integer discountTotalInt = discountTotal.get();
+        Integer deliveryFeeInt = deliveryFee.get();
+
+        return OrderProductInfoBrandDto.formOrderProductInfoBrandDto(
                 originalTotalPriceInt,
                 deliveryFeeInt,
                 discountTotalInt,
                 totalPrice,
-                productDetailBrandDtoList
+                orderProductInfoListDtos
         );
     }
 }
