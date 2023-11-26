@@ -538,6 +538,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
                                                         productDetailEntity.getDiscountRate(),
                                                         productEntity.getProductPrice(),
                                                         discountPrice,
+                                                        OrderProductInfo.getCount(),
                                                         productThumbnailsEntity.getThumbnailsImageUrl(),
                                                         productThumbnailsEntity.getThumbnailsImageName()
                                                 );
