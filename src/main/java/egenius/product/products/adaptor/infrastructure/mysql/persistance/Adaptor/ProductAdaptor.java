@@ -221,23 +221,29 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
         // 카테고리에 해당하는 상품 불러오기
         log.info("전체 조회:{}",findProductQuery.getCategoryType());
         List<ProductCategoryListEntity> productIds;
+        List<ProductEntity> productEntities;
         if(findProductQuery.getCategoryType().equals("all") & findProductQuery.getCategoryId() == null){
             log.info("전체 조회:{}",findProductQuery.getCategoryType());
-            productIds = productCategoryListRepository.findAllProductIds();
+            List<Long> productIdList =  productCategoryListRepository.findAllProductIds();
+            productEntities =
+                    productIdList.stream()
+                            .map(productId -> productRepository.findById(productId).get())
+                            .collect(Collectors.toList());
+
         }
         else {
             productIds = productCategoryListRepository.findByCategoryId(
                     categoryRepository.findById(findProductQuery.getCategoryId()).get()
             );
+
+            log.info("상품 조회:{}",productIds);
+            // 상품 테이블에서 데이터 가져오기 ( 상품 id, 상품이름, 상품가격, 브랜드 이름)
+            productEntities =
+                    productIds.stream()
+                            .map(ProductCategoryListEntity ->  ProductCategoryListEntity.getProductId())
+                            .collect(Collectors.toList());
+
         }
-
-        log.info("상품 조회:{}",productIds);
-        // 상품 테이블에서 데이터 가져오기 ( 상품 id, 상품이름, 상품가격, 브랜드 이름)
-        List<ProductEntity> productEntities =
-                productIds.stream()
-                .map(ProductCategoryListEntity ->  ProductCategoryListEntity.getProductId())
-                .collect(Collectors.toList());
-
 
         List<FindProductDto> findProductDtos =
                 productEntities.stream()

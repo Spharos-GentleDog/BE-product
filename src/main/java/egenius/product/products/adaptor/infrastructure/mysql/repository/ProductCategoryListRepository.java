@@ -18,6 +18,7 @@ public interface ProductCategoryListRepository extends JpaRepository<ProductCate
 
     List<ProductCategoryListEntity> findByCategoryId(ProductCategoryEntity productCategoryEntity);
 
-    @Query("select p from ProductCategoryListEntity p group by p.productId")
-    List<ProductCategoryListEntity> findAllProductIds();
+    @Query(value = "select product_id FROM product_category_list group by product_id", nativeQuery = true)
+    List<Long> findAllProductIds();
+
 }
