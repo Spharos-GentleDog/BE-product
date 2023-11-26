@@ -1,12 +1,18 @@
 package egenius.product.products.application.service;
 
 import egenius.product.products.application.ports.in.port.CreateProductUseCase;
+import egenius.product.products.application.ports.in.port.FindProductDetailUseCase;
 import egenius.product.products.application.ports.in.port.FindProductUseCase;
 import egenius.product.products.application.ports.in.query.CreateProductQuery;
+import egenius.product.products.application.ports.in.query.FindProductDetailQuery;
+import egenius.product.products.application.ports.in.query.FindProductListQuery;
 import egenius.product.products.application.ports.in.query.FindProductQuery;
 import egenius.product.products.application.ports.out.dto.CreateProductDto;
+import egenius.product.products.application.ports.out.dto.FindProductDetailDto;
 import egenius.product.products.application.ports.out.dto.FindProductDto;
+import egenius.product.products.application.ports.out.dto.ProductDetailBrandDto;
 import egenius.product.products.application.ports.out.port.CreateProductPort;
+import egenius.product.products.application.ports.out.port.FindProductDetailPort;
 import egenius.product.products.application.ports.out.port.FindProductPort;
 import egenius.product.products.domain.ProductDetails;
 import egenius.product.products.domain.Products;
@@ -19,10 +25,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductService implements CreateProductUseCase, FindProductUseCase {
+public class ProductService implements CreateProductUseCase, FindProductUseCase, FindProductDetailUseCase {
 
     private final CreateProductPort createProductPort;
     private final FindProductPort findProductPort;
+    private final FindProductDetailPort findProductDetailPort;
 
     @Override
     public void createProduct(CreateProductQuery createProductQuery) {
@@ -55,5 +62,10 @@ public class ProductService implements CreateProductUseCase, FindProductUseCase 
     @Override
     public List<FindProductDto> findProduct(FindProductQuery findProductQuery) {
         return findProductPort.findProduct(findProductQuery);
+    }
+
+    @Override
+    public FindProductDetailDto findProductDetail(FindProductListQuery findProductListQuery) {
+        return findProductDetailPort.findProductDetail(findProductListQuery);
     }
 }

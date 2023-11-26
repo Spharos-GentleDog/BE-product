@@ -10,9 +10,21 @@ import java.util.List;
 public class FindProductDetailDto {
 
 
-    private Long productId;
-    private String productName;
-    private Integer productPrice;
-    private List<String> productThumnailImageUrl;
+    private Integer originalTotalPrice;
+    private Integer deliveryFee;
+    private Integer discountTotal;
+    private Integer totalPrice;
+    private List<ProductDetailBrandDto> productDetailBrandDtoList;
+
+    public static FindProductDetailDto formFindProductDetailDto(Integer originalTotalPrice, Integer deliveryFee, Integer discountTotal,
+                                                                Integer totalPrice, List<ProductDetailBrandDto> productDetailBrandDtoList){
+        return FindProductDetailDto.builder()
+                .originalTotalPrice(originalTotalPrice)
+                .deliveryFee(deliveryFee)
+                .discountTotal(discountTotal)
+                .totalPrice(totalPrice)
+                .productDetailBrandDtoList(productDetailBrandDtoList)
+                .build();
+    }
 
 }

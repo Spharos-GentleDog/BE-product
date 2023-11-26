@@ -1,14 +1,21 @@
 package egenius.product.products.adaptor.web.controller;
 
 import egenius.product.global.common.response.BaseResponse;
+import egenius.product.products.adaptor.web.request.RequestBrandProductList;
 import egenius.product.products.adaptor.web.request.RequestCreateProduct;
+import egenius.product.products.adaptor.web.request.RequestProducts;
 import egenius.product.products.application.ports.in.port.CreateProductUseCase;
+import egenius.product.products.application.ports.in.port.FindProductDetailUseCase;
 import egenius.product.products.application.ports.in.port.FindProductUseCase;
 import egenius.product.products.application.ports.in.query.CreateProductQuery;
+import egenius.product.products.application.ports.in.query.FindProductDetailQuery;
+import egenius.product.products.application.ports.in.query.FindProductListQuery;
 import egenius.product.products.application.ports.in.query.FindProductQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -18,6 +25,7 @@ public class ProductController {
 
     private final CreateProductUseCase createProductUseCase;
     private final FindProductUseCase findProductUseCase;
+    private final FindProductDetailUseCase findProductDetailUseCase;
 
     @PostMapping("/product-create")
     public BaseResponse<?> productCreate(@RequestBody RequestCreateProduct requestCreateProduct){
@@ -43,7 +51,7 @@ public class ProductController {
 
     @GetMapping("/product-find")
     public BaseResponse<?> productFind(@RequestParam("categoryType") String categoryType,
-                                       @RequestParam("CategoryId") Integer CategoryId,
+                                       @RequestParam(value = "CategoryId", required = false) Integer CategoryId,
 //                                       @RequestParam("sizeName") String sizeName,
 //                                       @RequestParam("colorName") String colorName,
 //                                       @RequestParam("productType") String productType,
@@ -69,12 +77,21 @@ public class ProductController {
         )));
     }
 
-//    @GetMapping("/find-product-detail")
-//    public BaseResponse<?> findProductDetail(@RequestParam("productCode") String productCode){
-//        log.info("상품 상세 조회");
-//
-//        return new BaseResponse<>(findProductUseCase.findProductDetail(productCode));
-//    }
+    @PostMapping("/find-product-detail")
+    public BaseResponse<?> findProductDetail(@RequestBody RequestBrandProductList requestBrandProductList){
+        log.info("상품 상세 조회");
+
+        FindProductListQuery findProductListQuery =
+                FindProductListQuery.toQuery(
+                        requestBrandProductList.getRequestProductsList().stream()
+                                .map(requestProducts -> FindProductDetailQuery.toQuery(
+                                        requestProducts.getBrandName(),
+                                        requestProducts.getProductDetailIds()
+                                ))
+                                .collect(Collectors.toList()));
+
+        return new BaseResponse<>(findProductDetailUseCase.findProductDetail(findProductListQuery));
+    }
 
 
 }
