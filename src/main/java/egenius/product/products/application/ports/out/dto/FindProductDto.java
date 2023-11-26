@@ -20,14 +20,14 @@ public class FindProductDto {
 //    private Integer discountMaxPrice; // 최대 할인 가격
     private Integer totalFavorite; // 총 좋아요 수
     private List<String> Sizes; // 사이즈
-    private List<String> Colors; //
+    private List<ColorDto> Colors; //
     private String salesStatus; // 판매 상태 (0: 판매중, 1: 품절, 2: 판매중지)
 
 
     public static FindProductDto formFindProductDto(Long productId, String productName, Integer productPrice,
                                                     String MainImageName, String MainImageUrl, String brandName,
                                                     List<DiscountsDto> discounts, Integer totalFavorite,
-                                                    List<String> Sizes, List<String> Colors, String salesStatus) {
+                                                    List<String> Sizes, List<ColorDto> Colors, String salesStatus) {
         return FindProductDto.builder()
                 .productId(productId)
                 .productName(productName)

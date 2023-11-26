@@ -10,11 +10,11 @@ import egenius.product.global.common.exception.BaseException;
 import egenius.product.global.common.response.BaseResponseStatus;
 import egenius.product.products.adaptor.infrastructure.mysql.entity.*;
 import egenius.product.products.adaptor.infrastructure.mysql.repository.*;
+import egenius.product.products.application.ports.in.query.FindProductListQuery;
 import egenius.product.products.application.ports.in.query.FindProductQuery;
-import egenius.product.products.application.ports.out.dto.CreateProductDto;
-import egenius.product.products.application.ports.out.dto.DiscountsDto;
-import egenius.product.products.application.ports.out.dto.FindProductDto;
+import egenius.product.products.application.ports.out.dto.*;
 import egenius.product.products.application.ports.out.port.CreateProductPort;
+import egenius.product.products.application.ports.out.port.FindProductDetailPort;
 import egenius.product.products.application.ports.out.port.FindProductPort;
 import egenius.product.products.domain.Products;
 import egenius.product.sizes.adaptor.infrastructure.mysql.entity.SizeEntity;
@@ -24,16 +24,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ProductAdaptor implements CreateProductPort, FindProductPort {
+public class ProductAdaptor implements CreateProductPort, FindProductPort, FindProductDetailPort {
 
     private final ProductRepository productRepository;
     private final FavoriteProductTotalRepository favoriteProductTotalRepository;
@@ -218,9 +217,18 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
     public List<FindProductDto> findProduct(FindProductQuery findProductQuery) {
 
         // 카테고리에 해당하는 상품 불러오기
-        List<ProductCategoryListEntity> productIds = productCategoryListRepository.findByCategoryId(
-                categoryRepository.findById(findProductQuery.getCategoryId()).get()
-        );
+        log.info("전체 조회:{}",findProductQuery.getCategoryType());
+        List<ProductCategoryListEntity> productIds;
+        if(findProductQuery.getCategoryType().equals("all") & findProductQuery.getCategoryId() == null){
+            log.info("전체 조회:{}",findProductQuery.getCategoryType());
+            productIds = productCategoryListRepository.findAll();
+        }
+        else {
+            productIds = productCategoryListRepository.findByCategoryId(
+                    categoryRepository.findById(findProductQuery.getCategoryId()).get()
+            );
+        }
+
 
         log.info("상품 조회:{}",productIds);
         // 상품 테이블에서 데이터 가져오기 ( 상품 id, 상품이름, 상품가격, 브랜드 이름)
@@ -257,7 +265,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
 
 
                     List<String> sizeNames = new ArrayList<>();
-                    List<String> colorNames = new ArrayList<>();
+                    List<ColorDto> colorNames = new ArrayList<>();
                     String salesStatus = null;
                     List<DiscountsDto> discountsDtos = null;
                     List<Integer> salesStatusList =
@@ -285,7 +293,16 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
 
                                             if (vendorProductEntity.getSalesStatus() == 1) {
                                                 sizeNames.add(ProductDetailEntity.getSize());
-                                                colorNames.add(ProductDetailEntity.getColor());
+                                                Optional<ColorEntity> colorEntity =
+                                                        colorRepository.findByColorName(ProductDetailEntity.getColor());
+                                                ColorDto colorDto = ColorDto.formColorDto(
+                                                        colorEntity.get().getColorName(),
+                                                        colorEntity.get().getColorCode()
+                                                );
+                                                // 중복 체크 및 추가
+                                                if (!colorNames.stream().anyMatch(c -> c.getColorName().equals(colorDto.getColorName()))) {
+                                                    colorNames.add(colorDto);
+                                                }
                                                 return DiscountsDto.formDiscountsDto(
                                                         ProductDetailEntity.getId(),
                                                         ProductDetailEntity.getDiscountRate(),
@@ -347,7 +364,6 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
 
                         // 판매여부 조회
 
-
                         return FindProductDto.formFindProductDto(
                                 ProductEntity.getId(),
                                 ProductEntity.getProductName(),
@@ -358,7 +374,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
                                 discountsDtos,
                                 favoriteProductTotalEntity.getTotalFavorite(),
                                 sizeNames.stream().distinct().collect(Collectors.toList()),
-                                colorNames.stream().distinct().collect(Collectors.toList()),
+                                colorNames,
                                 salesStatus
                         );
                     }
@@ -369,5 +385,97 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort {
 
 //        log.info("상품 조회:{}",productEntities.getBrandName());
         return findProductDtos;
+    }
+
+    @Override
+    public FindProductDetailDto findProductDetail(FindProductListQuery findProductListQuery) {
+
+        //ProductDetailBrandDto 생성
+        AtomicInteger originalTotalPrice = new AtomicInteger(0);
+        AtomicInteger discountTotal = new AtomicInteger(0);
+        AtomicInteger deliveryFee = new AtomicInteger(0);
+        Integer totalPrice;
+
+        List<ProductDetailBrandDto> productDetailBrandDtoList =
+                findProductListQuery.getFindProductDetailQueryList().stream()
+                        .map(FindProductDetailQuery -> {
+
+                            String brandName = FindProductDetailQuery.getBrandName();
+                            AtomicInteger brandTotalPrice = new AtomicInteger(0);
+                            AtomicInteger brandTotalDiscount = new AtomicInteger(0);
+                            List<ProductDetailDto> productDetailDtoList =
+                                    FindProductDetailQuery.getProductDetailIds().stream()
+                                    .map(productDetailId -> {
+
+                                        // 상품 세부 데이터 가져오기
+                                        Optional<ProductDetailEntity> productDetailEntityOptional =
+                                                productDetailRepository.findById(productDetailId);
+                                        ProductDetailEntity productDetailEntity = productDetailEntityOptional.get();
+
+
+                                        // 상품 데이터 가져오기
+                                        ProductEntity productEntity = productDetailEntity.getProductId();
+
+                                        // 상품 대표이미지 가져오기
+                                        ProductThumbnailsEntity productThumbnailsEntity =
+                                                productThumbnailsRepository.findByProductIdAndUsedMainImage(
+                                                        productEntity, 1);
+
+                                        // 할인 후 금액 계산하기
+                                        Integer discountPrice = 0;
+                                        if (productDetailEntity.getDiscountRate() != null) {
+                                            if (productDetailEntity.getDiscountTypes() == 1) {
+                                                discountPrice = productEntity.getProductPrice() -
+                                                        productDetailEntity.getDiscountRate();
+                                            } else if (productDetailEntity.getDiscountTypes() == 2) {
+                                                discountPrice = productEntity.getProductPrice() -
+                                                        (productEntity.getProductPrice() * productDetailEntity.getDiscountRate() / 100);
+                                            }
+                                        }
+
+                                        brandTotalPrice.addAndGet(productEntity.getProductPrice());
+                                        brandTotalDiscount.addAndGet(discountPrice);
+
+                                        // 데이터 전달하기
+                                        return ProductDetailDto.formProductDetailDto(
+                                                productEntity.getBrandName(),
+                                                productEntity.getId(),
+                                                productDetailEntity.getId(),
+                                                productEntity.getProductName(),
+                                                productDetailEntity.getColor(),
+                                                productDetailEntity.getSize(),
+                                                productDetailEntity.getDiscountRate(),
+                                                productEntity.getProductPrice(),
+                                                discountPrice,
+                                                productThumbnailsEntity.getThumbnailsImageUrl(),
+                                                productThumbnailsEntity.getThumbnailsImageName()
+                                        );
+                                    })
+                                    .collect(Collectors.toList());
+
+                            originalTotalPrice.addAndGet(brandTotalPrice.get());
+                            discountTotal.addAndGet(brandTotalDiscount.get());
+                            if (brandTotalPrice.get() < 50000) {
+                                deliveryFee.addAndGet(3000);
+                            }
+                            return ProductDetailBrandDto.formProductDetailBrandDto(
+                                    brandName,
+                                    productDetailDtoList
+                            );
+                        })
+                        .collect(Collectors.toList());
+
+        totalPrice = originalTotalPrice.get() - discountTotal.get() + deliveryFee.get();
+        Integer originalTotalPriceInt = originalTotalPrice.get();
+        Integer discountTotalInt = discountTotal.get();
+        Integer deliveryFeeInt = deliveryFee.get();
+
+        return FindProductDetailDto.formFindProductDetailDto(
+                originalTotalPriceInt,
+                deliveryFeeInt,
+                discountTotalInt,
+                totalPrice,
+                productDetailBrandDtoList
+        );
     }
 }
