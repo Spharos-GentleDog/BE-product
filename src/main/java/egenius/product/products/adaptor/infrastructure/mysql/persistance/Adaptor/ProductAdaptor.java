@@ -738,7 +738,11 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
                                         vendorProductRepository.findByProductDetailId(ProductDetailEntity);
 
                                 if (vendorProductEntity.getSalesStatus() == 1) {
-                                    sizeNames.add(ProductDetailEntity.getSize());
+
+                                    if(!sizeNames.stream().anyMatch(s -> s.equals(ProductDetailEntity.getSize()))){
+                                        sizeNames.add(ProductDetailEntity.getSize());
+                                    }
+                                    
                                     Optional<ColorEntity> colorEntity =
                                             colorRepository.findByColorName(ProductDetailEntity.getColor());
                                     ColorDto colorDto = ColorDto.formColorDto(
