@@ -10,6 +10,7 @@ public class OrderProductInfoDto {
     private String brandName; // 상품
     private Long productId; // 상품 세부
     private Long productDetailId; // 상품 세부
+    private String productDetailCode; // 상품 세부
     private String productName; // 상품
     private String color; //상품세부
     private String size; // 상품세부
@@ -21,14 +22,15 @@ public class OrderProductInfoDto {
     private String ImgName; // 상품아이디 -> 섬네일이미지
 
     public static OrderProductInfoDto formOrderProductInfoDto(String brandName, Long productId, Long productDetailId,
-                                                              String productName, String color, String size,
-                                                              Integer discountRate, Integer productPrice,
-                                                            Integer discountedPrice, Integer count,
+                                                              String productDetailCode, String productName,
+                                                              String color, String size, Integer discountRate,
+                                                              Integer productPrice, Integer discountedPrice, Integer count,
                                                               String imgUrl, String ImgName){
         return OrderProductInfoDto.builder()
                 .brandName(brandName)
                 .productId(productId)
                 .productDetailId(productDetailId)
+                .productDetailCode(productDetailCode)
                 .productName(productName)
                 .color(color)
                 .size(size)
