@@ -10,12 +10,12 @@ import egenius.product.global.common.exception.BaseException;
 import egenius.product.global.common.response.BaseResponseStatus;
 import egenius.product.products.adaptor.infrastructure.mysql.entity.*;
 import egenius.product.products.adaptor.infrastructure.mysql.repository.*;
+import egenius.product.products.application.ports.in.query.AiServiceProductDetailQuery;
 import egenius.product.products.application.ports.in.query.FindProductListQuery;
 import egenius.product.products.application.ports.in.query.FindProductQuery;
 import egenius.product.products.application.ports.in.query.OrderProductInfoBrandQuery;
 import egenius.product.products.application.ports.out.dto.*;
 import egenius.product.products.application.ports.out.port.*;
-import egenius.product.products.domain.ImageInfo;
 import egenius.product.products.domain.Products;
 import egenius.product.sizes.adaptor.infrastructure.mysql.entity.SizeEntity;
 import egenius.product.sizes.adaptor.infrastructure.mysql.repository.SizesRepository;
@@ -26,14 +26,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class ProductAdaptor implements CreateProductPort, FindProductPort, FindProductDetailPort, OrderProductInfoPort,
-        ProductDetailPagePort {
+        ProductDetailPagePort, AiServiceProductDetailPort{
 
     private final ProductRepository productRepository;
     private final FavoriteProductTotalRepository favoriteProductTotalRepository;
@@ -538,6 +537,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
                                                         productEntity.getBrandName(),
                                                         productEntity.getId(),
                                                         productDetailEntity.getId(),
+                                                        productDetailEntity.getProductDetailCode(),
                                                         productEntity.getProductName(),
                                                         productDetailEntity.getColor(),
                                                         productDetailEntity.getSize(),
@@ -702,5 +702,83 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
                 sizeNames,
                 favoriteProductTotalEntity.getTotalFavorite()
         );
+    }
+
+    @Override
+    public List<AiServiceProductResultDto> formAiServiceProductDetail(AiServiceProductDetailQuery aiServiceProductDetailQuery) {
+
+
+        List<AiServiceProductResultDto> aiServiceProductResultDtos =
+                aiServiceProductDetailQuery.getProductIdList().stream()
+                .map(productId -> {
+
+                    // 상품 가져오기
+                    Optional<ProductEntity> productEntityOptional = productRepository.findById(productId);
+
+                    ProductEntity productEntity = productEntityOptional.get();
+
+
+                    // 상품 대표이미지 가져오기
+                    ProductThumbnailsEntity productThumbnailsEntity =
+                            productThumbnailsRepository.findByProductIdAndUsedMainImage(
+                                    productEntity, 1);
+
+                    // 판매중인 상품 색상 사이즈 가져오기
+                    List<ProductDetailEntity> productDetailEntityList =
+                            productDetailRepository.findByProductId(productEntity);
+
+                    List<String> sizeNames = new ArrayList<>();
+                    List<ColorDto> colorNames = new ArrayList<>();
+
+                    List<AiServiceProductDetailsDto> aiServiceProductDetailsDtos =
+                    productDetailEntityList.stream().map(
+                            ProductDetailEntity -> {
+                                VendorProductEntity vendorProductEntity =
+                                        vendorProductRepository.findByProductDetailId(ProductDetailEntity);
+
+                                if (vendorProductEntity.getSalesStatus() == 1) {
+                                    sizeNames.add(ProductDetailEntity.getSize());
+                                    Optional<ColorEntity> colorEntity =
+                                            colorRepository.findByColorName(ProductDetailEntity.getColor());
+                                    ColorDto colorDto = ColorDto.formColorDto(
+                                            colorEntity.get().getColorName(),
+                                            colorEntity.get().getColorCode()
+                                    );
+                                    // 중복 체크 및 추가
+                                    if (!colorNames.stream().anyMatch(c -> c.getColorName().equals(colorDto.getColorName()))) {
+                                        colorNames.add(colorDto);
+                                    }
+                                    return AiServiceProductDetailsDto.formAiServiceProductDetailsDto(
+                                            ProductDetailEntity.getId(),
+                                            ProductDetailEntity.getColor(),
+                                            ProductDetailEntity.getSize(),
+                                            ProductDetailEntity.getDiscountRate(),
+                                            ProductDetailEntity.getDiscountTypes()
+                                    );
+                                }
+                                return null;
+                            })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+                    if(aiServiceProductDetailsDtos.isEmpty()){
+                        return null;
+                    }
+
+                    return AiServiceProductResultDto.formAiServiceProductDetailDto(
+                            productEntity.getId(),
+                            productEntity.getProductName(),
+                            productEntity.getProductPrice(),
+                            aiServiceProductDetailsDtos,
+                            productThumbnailsEntity.getThumbnailsImageUrl(),
+                            productThumbnailsEntity.getThumbnailsImageName(),
+                            colorNames,
+                            sizeNames
+                    );
+
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return aiServiceProductResultDtos;
     }
 }

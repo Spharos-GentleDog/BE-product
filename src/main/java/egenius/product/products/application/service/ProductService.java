@@ -4,7 +4,6 @@ import egenius.product.products.application.ports.in.port.*;
 import egenius.product.products.application.ports.in.query.*;
 import egenius.product.products.application.ports.out.dto.*;
 import egenius.product.products.application.ports.out.port.*;
-import egenius.product.products.domain.ProductDetails;
 import egenius.product.products.domain.Products;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +15,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductService implements CreateProductUseCase, FindProductUseCase, FindProductDetailUseCase,
-        OrderProductDetailUseCase, ProductDetailPageUseCase {
+        OrderProductDetailUseCase, ProductDetailPageUseCase, AiServiceProductDetailUseCase{
 
     private final CreateProductPort createProductPort;
     private final FindProductPort findProductPort;
     private final FindProductDetailPort findProductDetailPort;
     private final OrderProductInfoPort orderProductInfoPort;
     private final ProductDetailPagePort productDetailPagePort;
+    private final AiServiceProductDetailPort aiServiceProductDetailPort;
 
     @Override
     public void createProduct(CreateProductQuery createProductQuery) {
@@ -70,5 +70,10 @@ public class ProductService implements CreateProductUseCase, FindProductUseCase,
     @Override
     public ProductDetailPageDto getProductDetailPage(Long productId) {
         return productDetailPagePort.getProductDetailPage(productId);
+    }
+
+    @Override
+    public List<AiServiceProductResultDto>  getAiServiceProductDetail(AiServiceProductDetailQuery aiServiceProductDetailQuery) {
+        return aiServiceProductDetailPort.formAiServiceProductDetail(aiServiceProductDetailQuery);
     }
 }
