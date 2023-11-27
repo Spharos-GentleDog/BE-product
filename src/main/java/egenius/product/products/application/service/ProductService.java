@@ -15,7 +15,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductService implements CreateProductUseCase, FindProductUseCase, FindProductDetailUseCase,
-        OrderProductDetailUseCase, ProductDetailPageUseCase, AiServiceProductDetailUseCase{
+        OrderProductDetailUseCase, ProductDetailPageUseCase, AiServiceProductDetailUseCase,
+    ColorSizeProductDetailUseCase {
 
     private final CreateProductPort createProductPort;
     private final FindProductPort findProductPort;
@@ -23,6 +24,7 @@ public class ProductService implements CreateProductUseCase, FindProductUseCase,
     private final OrderProductInfoPort orderProductInfoPort;
     private final ProductDetailPagePort productDetailPagePort;
     private final AiServiceProductDetailPort aiServiceProductDetailPort;
+    private final ColorSizeProductDetailPort colorSizeProductDetailPort;
 
     @Override
     public void createProduct(CreateProductQuery createProductQuery) {
@@ -75,5 +77,10 @@ public class ProductService implements CreateProductUseCase, FindProductUseCase,
     @Override
     public List<AiServiceProductResultDto>  getAiServiceProductDetail(AiServiceProductDetailQuery aiServiceProductDetailQuery) {
         return aiServiceProductDetailPort.formAiServiceProductDetail(aiServiceProductDetailQuery);
+    }
+
+    @Override
+    public ColorSizeProductDetailDto getColorSizeProductDetail(ColorSizeProductDetailQuery colorSizeProductDetailQuery) {
+        return colorSizeProductDetailPort.getColorSizeProductDetail(colorSizeProductDetailQuery);
     }
 }

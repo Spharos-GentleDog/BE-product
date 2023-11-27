@@ -19,4 +19,6 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetailEnti
     List<ProductDetailEntity> noDiscsountProductByProductId(@Param("productId") Long productId);
 
     List<ProductDetailEntity> findByProductId(ProductEntity productEntity);
+
+    ProductDetailEntity findByColorAndSizeAndProductId(String color, String size, ProductEntity productEntity);
 }
