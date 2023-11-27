@@ -8,6 +8,7 @@ import lombok.Getter;
 public class OrderProductInfoDto {
 
     private String brandName; // 상품
+    private String vendorEmail;
     private Long productId; // 상품 세부
     private Long productDetailId; // 상품 세부
     private String productDetailCode; // 상품 세부
@@ -21,13 +22,15 @@ public class OrderProductInfoDto {
     private String imgUrl; // 상품아이디 -> 섬네일이미지
     private String ImgName; // 상품아이디 -> 섬네일이미지
 
-    public static OrderProductInfoDto formOrderProductInfoDto(String brandName, Long productId, Long productDetailId,
+    public static OrderProductInfoDto formOrderProductInfoDto(String brandName, String vendorEmail,
+                                                              Long productId, Long productDetailId,
                                                               String productDetailCode, String productName,
                                                               String color, String size, Integer discountRate,
                                                               Integer productPrice, Integer discountedPrice, Integer count,
                                                               String imgUrl, String ImgName){
         return OrderProductInfoDto.builder()
                 .brandName(brandName)
+                .vendorEmail(vendorEmail)
                 .productId(productId)
                 .productDetailId(productDetailId)
                 .productDetailCode(productDetailCode)

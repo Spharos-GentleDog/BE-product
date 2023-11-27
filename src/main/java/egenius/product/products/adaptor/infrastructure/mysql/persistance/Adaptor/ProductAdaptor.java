@@ -10,10 +10,7 @@ import egenius.product.global.common.exception.BaseException;
 import egenius.product.global.common.response.BaseResponseStatus;
 import egenius.product.products.adaptor.infrastructure.mysql.entity.*;
 import egenius.product.products.adaptor.infrastructure.mysql.repository.*;
-import egenius.product.products.application.ports.in.query.AiServiceProductDetailQuery;
-import egenius.product.products.application.ports.in.query.FindProductListQuery;
-import egenius.product.products.application.ports.in.query.FindProductQuery;
-import egenius.product.products.application.ports.in.query.OrderProductInfoBrandQuery;
+import egenius.product.products.application.ports.in.query.*;
 import egenius.product.products.application.ports.out.dto.*;
 import egenius.product.products.application.ports.out.port.*;
 import egenius.product.products.domain.Products;
@@ -26,13 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class ProductAdaptor implements CreateProductPort, FindProductPort, FindProductDetailPort, OrderProductInfoPort,
-        ProductDetailPagePort, AiServiceProductDetailPort{
+        ProductDetailPagePort, AiServiceProductDetailPort, ColorSizeProductDetailPort{
 
     private final ProductRepository productRepository;
     private final FavoriteProductTotalRepository favoriteProductTotalRepository;
@@ -512,6 +510,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
 
                                                 // 상품 데이터 가져오기
                                                 ProductEntity productEntity = productDetailEntity.getProductId();
+                                                log.info("상품 데이터 :{}", productEntity.getVendorEmail());
 
                                                 // 상품 대표이미지 가져오기
                                                 ProductThumbnailsEntity productThumbnailsEntity =
@@ -535,6 +534,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
 
                                                 return OrderProductInfoDto.formOrderProductInfoDto(
                                                         productEntity.getBrandName(),
+                                                        productEntity.getVendorEmail(),
                                                         productEntity.getId(),
                                                         productDetailEntity.getId(),
                                                         productDetailEntity.getProductDetailCode(),
@@ -563,6 +563,7 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
 
                             return OrderProductInfoListDto.formOrderProductInfoListDto(
                                     brandName,
+                                    OrderProductInfoDtoList.get(0).getVendorEmail(),
                                     brandTotalPrice.get(),
                                     brandDeliveryFee,
                                     OrderProductInfoDtoList
@@ -780,5 +781,20 @@ public class ProductAdaptor implements CreateProductPort, FindProductPort, FindP
                 .collect(Collectors.toList());
 
         return aiServiceProductResultDtos;
+    }
+
+    @Override
+    public ColorSizeProductDetailDto getColorSizeProductDetail(ColorSizeProductDetailQuery colorSizeProductDetailQuery) {
+
+        ProductEntity productEntity = productRepository.findById(colorSizeProductDetailQuery.getProductId()).get();
+
+        ProductDetailEntity productDetailEntity =
+                productDetailRepository.findByColorAndSizeAndProductId(
+                        colorSizeProductDetailQuery.getColor(),
+                        colorSizeProductDetailQuery.getSize(),
+                        productEntity
+                );
+
+        return ColorSizeProductDetailDto.formColorSizeProductDetailDto(productDetailEntity.getId());
     }
 }

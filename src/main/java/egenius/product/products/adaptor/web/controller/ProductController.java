@@ -24,6 +24,7 @@ public class ProductController {
     private final OrderProductDetailUseCase orderProductDetailUseCase;
     private final ProductDetailPageUseCase productDetailPageUseCase;
     private final AiServiceProductDetailUseCase aiServiceProductDetailUseCase;
+    private final ColorSizeProductDetailUseCase colorSizeProductDetailUseCase;
 
     @PostMapping("/product-create")
     public BaseResponse<?> productCreate(@RequestBody RequestCreateProduct requestCreateProduct){
@@ -114,19 +115,31 @@ public class ProductController {
     }
 
     @GetMapping("/product-page")
-    public BaseResponse<?> productDetail(@RequestParam("productId") Long productId){
+    public BaseResponse<?> productPageProductDetail(@RequestParam("productId") Long productId){
         log.info("상품 상세 조회");
         return new BaseResponse<>(productDetailPageUseCase.getProductDetailPage(productId));
     }
 
     @PostMapping("/ai-product-detail")
-    public BaseResponse<?> findProductDetailIds(@RequestBody RequestProductIds requestProductIds){
+    public BaseResponse<?> aiServiceFindProductDetailIds(@RequestBody RequestProductIds requestProductIds){
 
         log.info("상품 상세 조회");
 
         return new BaseResponse<>(aiServiceProductDetailUseCase.getAiServiceProductDetail(
                 AiServiceProductDetailQuery.toQuery(
                         requestProductIds.getProductIds()
+                )));
+    }
+
+    @PostMapping("/findby-color-size")
+    public BaseResponse<?> findProductDetailIds(@RequestBody RequestColorSize requestColorSize){
+
+        log.info("상품 상세 조회");
+        return new BaseResponse<>(colorSizeProductDetailUseCase.getColorSizeProductDetail(
+                ColorSizeProductDetailQuery.toQuery(
+                        requestColorSize.getProductId(),
+                        requestColorSize.getColor(),
+                        requestColorSize.getSize()
                 )));
     }
 
