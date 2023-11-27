@@ -112,7 +112,7 @@ public class ProductController {
         return new BaseResponse<>(orderProductDetailUseCase.orderProductDetail(orderProductInfoBrandQuery));
     }
 
-    @GetMapping("/product-detail-page")
+    @GetMapping("/product-page")
     public BaseResponse<?> productDetail(@RequestParam("productId") Long productId){
         log.info("상품 상세 조회");
 
